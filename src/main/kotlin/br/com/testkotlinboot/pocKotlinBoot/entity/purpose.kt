@@ -11,7 +11,6 @@ import javax.persistence.FetchType
 data class Purpose(
 
         @Id
-        @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.AUTO)
         var purpose_id: Long = 0,
 
@@ -35,7 +34,7 @@ data class Purpose(
         var description: String = "",
 
         @ManyToMany(mappedBy = "purposes")
-        var persons: MutableList<Person> = mutableListOf(),
+        var persons: List<Person> = emptyList(),
 
         @OneToMany(mappedBy = "purpose", fetch = FetchType.EAGER)
         var payments: List<Payment> = emptyList()

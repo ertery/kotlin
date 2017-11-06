@@ -11,7 +11,7 @@ data class Person(
 
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: Long = 0,
+        var person_id: Long = 0,
 
         var name: String = "",
 
@@ -25,6 +25,9 @@ data class Person(
         var phoneNumber: String = "",
 
         var email: String = "",
+
+        @Column(name = "isinitial")
+        var isInitial : Boolean = false,
 
         @ManyToMany(cascade = arrayOf(CascadeType.ALL))
         @JoinTable(name = "purpose_person", joinColumns = arrayOf(
