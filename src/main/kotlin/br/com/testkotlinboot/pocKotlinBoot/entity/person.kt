@@ -26,8 +26,8 @@ data class Person(
 
         var email: String = "",
 
-     /*   @Column(name = "isinitial")
-        var isInitial : Boolean = false,*/
+        @Column(name = "isinitial")
+        var isInitial : Boolean = false,
 
         @OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
         var payments: List<Payment> = emptyList()

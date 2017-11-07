@@ -1,88 +1,81 @@
-/*create type paymentstate as enum ('New', 'InProgress', 'Done', 'Declined')
-;
+/*
+CREATE TYPE PAYMENTSTATE AS ENUM ('New', 'InProgress', 'Done', 'Declined');
 
-create type paymentmethod as enum ('Cash', 'Clearing', 'Debt')
-;
+CREATE TYPE PAYMENTMETHOD AS ENUM ('Cash', 'Clearing', 'Debt');
 
-create type channel as enum ('iOS', 'Telegramm')
-;
+CREATE TYPE CHANNEL AS ENUM ('iOS', 'Telegramm');
 
-create type personpurposestate as enum ('Accept', 'Decline', 'InviteSend', 'Initial')
-;
+CREATE TYPE PERSONPURPOSESTATE AS ENUM ('Accept', 'Decline', 'InviteSend', 'Initial');
 
-create table purpose
+CREATE TABLE purpose
 (
-  purpose_id bigserial not null
-    constraint purpose_pkey
-    primary key,
-  name varchar(255) not null,
-  creationdate timestamp,
-  finishdate timestamp not null,
-  targetammount double precision not null,
-  currentammount double precision default 0,
-  imageurl varchar(255),
-  description varchar(255),
-)
-;
+  purpose_id     BIGSERIAL        NOT NULL
+    CONSTRAINT purpose_pkey
+    PRIMARY KEY,
+  name           VARCHAR(255)     NOT NULL,
+  creationdate   TIMESTAMP,
+  finishdate     TIMESTAMP        NOT NULL,
+  targetammount  DOUBLE PRECISION NOT NULL,
+  currentammount DOUBLE PRECISION DEFAULT 0,
+  imageurl       VARCHAR(255),
+  description    VARCHAR(255)
+);
 
-create table person
+CREATE TABLE person
 (
-  person_id bigserial not null
-    constraint person_pkey
-    primary key,
-  name varchar(255) not null,
-  registrationdate timestamp,
-  imagepath varchar(255),
-  phonenumber varchar(255),
-  email varchar(255),
-  purposestate personpurposestate,
-)
-;
+  person_id        BIGSERIAL    NOT NULL
+    CONSTRAINT person_pkey
+    PRIMARY KEY,
+  name             VARCHAR(255) NOT NULL,
+  registrationdate TIMESTAMP,
+  imagepath        VARCHAR(255),
+  phonenumber      VARCHAR(255),
+  email            VARCHAR(255),
+  purposestate     VARCHAR(255),
+  isinitial        BOOLEAN
+);
 
-create table purpose_person
+CREATE TABLE purpose_person
 (
-  person_id bigserial not null,
-  purpose_id bigserial not null
-    constraint payment_person_purpose_id_fkey
-    references purpose
-    constraint payment_person_purpose_id_fkey1
-    references person
-)
-;
+  person_id  BIGSERIAL NOT NULL
+    CONSTRAINT payment_person_purpose_id_fkey1
+    REFERENCES person,
+  purpose_id BIGSERIAL NOT NULL
+    CONSTRAINT payment_person_purpose_id_fkey
+    REFERENCES purpose,
+  CONSTRAINT purpose_person_person_id_purpose_id_pk
+  UNIQUE (person_id, purpose_id)
+);
 
-create table payment
+CREATE TABLE payment
 (
-  id bigserial not null
-    constraint payment_pkey
-    primary key,
-  ammount double precision default 0,
-  paymentdate date,
-  purpose_id integer
-    constraint payment_purpose_id_fkey
-    references purpose,
-  person_id integer
-    constraint payment_person_id_fkey
-    references person,
-  paymentmethod paymentmethod,
-  state paymentstate,
-  channel channel
-)
-;
+  id            BIGSERIAL NOT NULL
+    CONSTRAINT payment_pkey
+    PRIMARY KEY,
+  ammount       DOUBLE PRECISION DEFAULT 0,
+  paymentdate   DATE,
+  purpose_id    INTEGER
+    CONSTRAINT payment_purpose_id_fkey
+    REFERENCES purpose,
+  person_id     INTEGER
+    CONSTRAINT payment_person_id_fkey
+    REFERENCES person,
+  paymentmethod PAYMENTMETHOD,
+  state         PAYMENTSTATE,
+  channel       CHANNEL
+);
 
-create table card
+CREATE TABLE card
 (
-  id bigserial not null
-    constraint card_pkey
-    primary key,
-  cardholdername varchar(255),
-  number varchar(255),
-  validity date,
-  person_id integer
-    constraint card_person_id_fkey
-    references person
-)
-;*/
+  id             BIGSERIAL NOT NULL
+    CONSTRAINT card_pkey
+    PRIMARY KEY,
+  cardholdername VARCHAR(255),
+  number         VARCHAR(255),
+  validity       DATE,
+  person_id      INTEGER
+    CONSTRAINT card_person_id_fkey
+    REFERENCES person
+);
 
-
-
-
+*/
