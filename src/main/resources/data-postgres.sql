@@ -1,5 +1,5 @@
-INSERT INTO public.person (person_id, name, registrationdate, imagepath, phonenumber, email, purposestate, isinitial) VALUES (1, 'Пепка Прыгни', '2017-11-04 22:34:38.925000', 'http://pp.com', '88005553535', 'email@test.ru', 'Initial', false);
-INSERT INTO public.person (person_id, name, registrationdate, imagepath, phonenumber, email, purposestate, isinitial) VALUES (2, 'Мастер Йода', '2017-10-04 23:59:32.896000', 'http//death.star.com', '103', 'ioda@j-day.z', 'Accept', true);
+INSERT INTO public.person (person_id, name, registrationdate, imagepath, phonenumber, email, purposestate) VALUES (1, 'Пепка Прыгни', '2017-11-04 22:34:38.925000', 'http://pp.com', '88005553535', 'email@test.ru', 'Initial');
+INSERT INTO public.person (person_id, name, registrationdate, imagepath, phonenumber, email, purposestate) VALUES (2, 'Мастер Йода', '2017-10-04 23:59:32.896000', 'http//death.star.com', '103', 'ioda@j-day.z', 'Accept');
 
 INSERT INTO public.purpose (purpose_id, name, creationdate, finishdate, targetammount, currentammount, imageurl, description) VALUES (1, 'Test1', '2017-10-09 00:00:00.000000', '2017-10-13 00:00:00.000000', 300, 0, 'user.pic', 'это что за покемон');
 INSERT INTO public.purpose (purpose_id, name, creationdate, finishdate, targetammount, currentammount, imageurl, description) VALUES (2, 'ДР Канальи', '2017-11-04 23:46:08.870000', '2017-11-08 23:46:19.957000', 1000, 300, 'penk', 'на ракеты');

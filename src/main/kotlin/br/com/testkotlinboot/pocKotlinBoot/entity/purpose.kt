@@ -1,9 +1,8 @@
 package br.com.testkotlinboot.pocKotlinBoot.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDateTime
 import javax.persistence.*
-import javax.persistence.FetchType
-
 
 
 @Entity
@@ -12,7 +11,7 @@ data class Purpose(
 
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        var purpose_id: Long = 0,
+        var purposeId: Long = 0,
 
         var name: String = "",
 
@@ -31,11 +30,12 @@ data class Purpose(
         @Column(name = "imageurl")
         var imageUrl: String = "",
 
-        var description: String = "",
+        var description: String = ""
+) {
+    @JsonIgnore
+    @ManyToMany(mappedBy = "purposes", fetch = FetchType.EAGER)
+    var persons: MutableList<Person> = mutableListOf()
 
-        @ManyToMany(mappedBy = "purposes")
-        var persons: List<Person> = emptyList(),
-
-        @OneToMany(mappedBy = "purpose", fetch = FetchType.EAGER)
-        var payments: List<Payment> = emptyList()
-)
+    @OneToMany(mappedBy = "purpose")
+    var payments: List<Payment> = emptyList()
+}

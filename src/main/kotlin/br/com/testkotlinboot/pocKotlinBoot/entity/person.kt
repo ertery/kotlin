@@ -11,7 +11,7 @@ data class Person(
 
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        var person_id: Long = 0,
+        var personId: Long = 0,
 
         var name: String = "",
 
@@ -26,24 +26,25 @@ data class Person(
 
         var email: String = "",
 
-        @Column(name = "isinitial")
-        var isInitial : Boolean = false,
-
-        @ManyToMany(cascade = arrayOf(CascadeType.ALL))
-        @JoinTable(name = "purpose_person", joinColumns = arrayOf(
-                JoinColumn(name = "person_id", nullable = false, updatable = false)),
-                inverseJoinColumns = arrayOf(JoinColumn(name = " purpose_id",
-                        nullable = false, updatable = false)))
-        var purposes: MutableList<Purpose> = mutableListOf(),
+     /*   @Column(name = "isinitial")
+        var isInitial : Boolean = false,*/
 
         @OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
         var payments: List<Payment> = emptyList()
 ) {
 
+    @ManyToMany(cascade = arrayOf(CascadeType.ALL))
+    @JoinTable(name = "purpose_person", joinColumns = arrayOf(
+            JoinColumn(name = "person_id", nullable = false)),
+            inverseJoinColumns = arrayOf(JoinColumn(name = " purpose_id",
+                    nullable = false)))
+    var purposes: MutableList<Purpose> = mutableListOf()
+
     @OneToOne()
     @PrimaryKeyJoinColumn
     lateinit var paymentCard: PaymentCard
 
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "purposestate")
     lateinit var purposeState: PersonPurposeState
 }
