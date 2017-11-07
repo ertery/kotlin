@@ -12,7 +12,7 @@ create type personpurposestate as enum ('Accept', 'Decline', 'InviteSend', 'Init
 
 create table purpose
 (
-  id bigserial not null
+  purpose_id bigserial not null
     constraint purpose_pkey
     primary key,
   name varchar(255) not null,
@@ -22,13 +22,12 @@ create table purpose
   currentammount double precision default 0,
   imageurl varchar(255),
   description varchar(255),
-  person_id integer
 )
 ;
 
 create table person
 (
-  id bigserial not null
+  person_id bigserial not null
     constraint person_pkey
     primary key,
   name varchar(255) not null,
@@ -37,7 +36,6 @@ create table person
   phonenumber varchar(255),
   email varchar(255),
   purposestate personpurposestate,
-  purpose_id integer
 )
 ;
 
