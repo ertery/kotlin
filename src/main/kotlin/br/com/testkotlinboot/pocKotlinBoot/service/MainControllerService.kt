@@ -1,6 +1,8 @@
 package br.com.testkotlinboot.pocKotlinBoot.service
 
 
+import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
+import br.com.testkotlinboot.pocKotlinBoot.entity.Person
 import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,7 +15,9 @@ class MainControllerService(val repository: PurposeRepository) {
     fun getPurposes(): Any {
         val findAll = repository.findAll()
         println(findAll)
-        return findAll
+        val records: MutableList<PurposeRecord> = mutableListOf()
+        findAll.forEach { purpose -> records.add(purpose.toDTO())}
+        return records
     }
 
     fun getPurposeById(id: Long) = repository.findOne(id)

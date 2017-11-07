@@ -1,5 +1,6 @@
 package br.com.testkotlinboot.pocKotlinBoot.entity
 
+import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -38,4 +39,11 @@ data class Purpose(
 
     @OneToMany(mappedBy = "purpose")
     var payments: List<Payment> = emptyList()
+
+    fun toDTO(): PurposeRecord = PurposeRecord(
+            name = this.name,
+            creationDate = this.creationDate,
+            persons = this.persons
+
+    )
 }
