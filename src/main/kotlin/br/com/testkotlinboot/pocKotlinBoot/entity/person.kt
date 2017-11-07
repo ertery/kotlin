@@ -26,9 +26,6 @@ data class Person(
 
         var email: String = "",
 
-        @Column(name = "isinitial")
-        var isInitial : Boolean = false,
-
         @OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
         var payments: List<Payment> = emptyList()
 ) {
@@ -42,7 +39,7 @@ data class Person(
 
     @OneToOne()
     @PrimaryKeyJoinColumn
-    lateinit var paymentCard: PaymentCard
+    var paymentCard: PaymentCard = PaymentCard()
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "purposestate")

@@ -28,6 +28,9 @@ data class Purpose(
         @Column(name = "currentammount")
         var currentAmmount: Double = Double.MIN_VALUE,
 
+        @Column
+        var initiatorId: Int = -1,
+
         @Column(name = "imageurl")
         var imageUrl: String = "",
 

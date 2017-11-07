@@ -1,12 +1,12 @@
 package br.com.testkotlinboot.pocKotlinBoot.controller
 
-import br.com.testkotlinboot.pocKotlinBoot.service.MainControllerService
+import br.com.testkotlinboot.pocKotlinBoot.service.PurposeControllerService
 import org.springframework.web.bind.annotation.*
 
 
 @RestController
 @RequestMapping("/purpose")
-class MainController(val service: MainControllerService) {
+class PurposeController(val service: PurposeControllerService) {
 
     @RequestMapping("/all")
     fun getPurposes() = service.getPurposes()

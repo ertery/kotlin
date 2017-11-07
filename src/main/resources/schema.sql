@@ -1,7 +1,6 @@
-/*
 CREATE TYPE PAYMENTSTATE AS ENUM ('New', 'InProgress', 'Done', 'Declined');
 
-CREATE TYPE PAYMENTMETHOD AS ENUM ('Cash', 'Clearing', 'Debt');
+CREATE TYPE PAYMENTMETHOD AS ENUM ('cash', 'clearing', 'debt');
 
 CREATE TYPE CHANNEL AS ENUM ('iOS', 'Telegramm');
 
@@ -18,7 +17,8 @@ CREATE TABLE purpose
   targetammount  DOUBLE PRECISION NOT NULL,
   currentammount DOUBLE PRECISION DEFAULT 0,
   imageurl       VARCHAR(255),
-  description    VARCHAR(255)
+  description    VARCHAR(255),
+  initiator_id   INTEGER
 );
 
 CREATE TABLE person
@@ -31,18 +31,17 @@ CREATE TABLE person
   imagepath        VARCHAR(255),
   phonenumber      VARCHAR(255),
   email            VARCHAR(255),
-  purposestate     VARCHAR(255),
-  isinitial        BOOLEAN
+  purposestate     VARCHAR(255)
 );
 
 CREATE TABLE purpose_person
 (
-  person_id  BIGSERIAL NOT NULL
-    CONSTRAINT payment_person_purpose_id_fkey1
-    REFERENCES person,
+  person_id  BIGSERIAL NOT NULL,
   purpose_id BIGSERIAL NOT NULL
     CONSTRAINT payment_person_purpose_id_fkey
-    REFERENCES purpose,
+    REFERENCES purpose
+    CONSTRAINT payment_person_purpose_id_fkey1
+    REFERENCES person,
   CONSTRAINT purpose_person_person_id_purpose_id_pk
   UNIQUE (person_id, purpose_id)
 );
@@ -78,4 +77,3 @@ CREATE TABLE card
     REFERENCES person
 );
 
-*/

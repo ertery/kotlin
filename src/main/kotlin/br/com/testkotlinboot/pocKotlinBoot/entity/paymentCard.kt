@@ -1,5 +1,6 @@
 package br.com.testkotlinboot.pocKotlinBoot.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
 import javax.persistence.*
 
@@ -19,7 +20,7 @@ data class PaymentCard(
         var cardholderName: String = ""
 
 ) {
-
+    @JsonIgnore
     @OneToOne(mappedBy = "paymentCard")
     lateinit var person: Person
 }
