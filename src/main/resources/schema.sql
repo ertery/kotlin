@@ -1,3 +1,4 @@
+/*
 CREATE TYPE PAYMENTSTATE AS ENUM ('New', 'InProgress', 'Done', 'Declined');
 
 CREATE TYPE PAYMENTMETHOD AS ENUM ('cash', 'clearing', 'debt');
@@ -18,7 +19,7 @@ CREATE TABLE purpose
   currentammount DOUBLE PRECISION DEFAULT 0,
   imageurl       VARCHAR(255),
   description    VARCHAR(255),
-  initiator_id   INTEGER
+  initiator_id   BIGINT
 );
 
 CREATE TABLE person
@@ -77,3 +78,4 @@ CREATE TABLE card
     REFERENCES person
 );
 
+*/

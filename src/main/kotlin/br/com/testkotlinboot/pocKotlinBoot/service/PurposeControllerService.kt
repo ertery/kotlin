@@ -23,5 +23,8 @@ class PurposeControllerService(val repository: PurposeRepository) {
         return findOne.toDTO()
     }
 
-    fun getPurposeByName(name: String) = repository.findByName(name)
+    fun getPurposeByName(name: String) : Any {
+        val findByName = repository.findByName(name)
+        return findByName.toDTO()
+    }
 }

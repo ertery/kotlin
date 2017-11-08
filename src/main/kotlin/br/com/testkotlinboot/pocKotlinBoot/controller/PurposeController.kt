@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/purpose")
 class PurposeController(val service: PurposeControllerService) {
 
-    @RequestMapping("/all")
+    @RequestMapping("/")
     fun getPurposes() = service.getPurposes()
 
     @GetMapping("/id")

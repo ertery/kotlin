@@ -15,6 +15,6 @@ class PersonControllerService(val repository: PersonRepository) {
         val person: Person = repository.findOne(id)
         return if (!isInitial)
             person.purposes
-        else person.purposes.filter { purpose -> purpose.initiatorId.toLong() == id }
+        else person.purposes.filter { purpose -> purpose.initiatorId == id }
     }
 }

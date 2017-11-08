@@ -1,5 +1,8 @@
 package br.com.testkotlinboot.pocKotlinBoot.entity
 
+import br.com.testkotlinboot.pocKotlinBoot.enums.Channel
+import br.com.testkotlinboot.pocKotlinBoot.enums.PaymentMethod
+import br.com.testkotlinboot.pocKotlinBoot.enums.PaymentState
 import java.time.LocalDate
 import java.util.*
 import javax.persistence.*
@@ -18,14 +21,14 @@ data class Payment(
         var paymentDate: LocalDate = LocalDate.now()
 
 ) {
-    @Enumerated(EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)
     lateinit var state: PaymentState
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "paymentmethod")
     lateinit var paymentMethod: PaymentMethod
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)
     lateinit var channel: Channel
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -35,16 +38,4 @@ data class Payment(
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "purpose_id")
     lateinit var purpose: Purpose
-}
-
-enum class PaymentState {
-    NEW, INPROGRESS, DONE, DECLINED
-}
-
-enum class PaymentMethod {
-    CASH, CLEARING, DEBT
-}
-
-enum class Channel {
-    IOS, Telegramm
 }

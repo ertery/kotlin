@@ -29,7 +29,7 @@ data class Purpose(
         var currentAmmount: Double = Double.MIN_VALUE,
 
         @Column
-        var initiatorId: Int = -1,
+        var initiatorId: Long = -1,
 
         @Column(name = "imageurl")
         var imageUrl: String = "",
@@ -46,7 +46,9 @@ data class Purpose(
     fun toDTO(): PurposeRecord = PurposeRecord(
             name = this.name,
             creationDate = this.creationDate,
-            persons = this.persons
-
+            targetAmount = this.targetAmmount!!,
+            imageUrl = this.imageUrl,
+            description = this.description,
+            persons = this.persons.map { person -> person.name} as MutableList<String>
     )
 }

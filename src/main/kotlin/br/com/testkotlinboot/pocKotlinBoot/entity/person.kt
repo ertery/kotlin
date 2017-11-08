@@ -1,5 +1,6 @@
 package br.com.testkotlinboot.pocKotlinBoot.entity
 
+import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import java.time.LocalDateTime
 import javax.persistence.*
 import javax.persistence.FetchType
@@ -46,6 +47,3 @@ data class Person(
     lateinit var purposeState: PersonPurposeState
 }
 
-enum class PersonPurposeState {
-    ACCEPT, DECLINE, INVITESEND, INITIAL
-}
