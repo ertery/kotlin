@@ -1,5 +1,6 @@
 package br.com.testkotlinboot.pocKotlinBoot.entity
 
+import br.com.testkotlinboot.pocKotlinBoot.dto.PersonList
 import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDateTime
@@ -44,11 +45,12 @@ data class Purpose(
     var payments: List<Payment> = emptyList()
 
     fun toDTO(): PurposeRecord = PurposeRecord(
+            id = this.purposeId,
             name = this.name,
-            creationDate = this.creationDate,
+            currentAmmount = this.currentAmmount,
             targetAmount = this.targetAmmount!!,
             imageUrl = this.imageUrl,
             description = this.description,
-            persons = this.persons.map { person -> person.name} as MutableList<String>
+            persons = this.persons.map { (personId, name1) -> PersonList(id = personId, name = name1)} as MutableList<PersonList>
     )
 }
