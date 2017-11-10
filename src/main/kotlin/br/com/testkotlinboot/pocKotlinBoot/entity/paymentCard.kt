@@ -9,7 +9,8 @@ import javax.persistence.*
 data class PaymentCard(
 
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @SequenceGenerator(name = "card_seq", sequenceName = "card_id_seq")
+        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "card_seq")
         var id: Long = 0,
 
         var validity: Date? = null,

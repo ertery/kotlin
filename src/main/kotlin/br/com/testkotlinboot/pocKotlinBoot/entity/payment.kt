@@ -13,7 +13,8 @@ import javax.persistence.*
 data class Payment(
 
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @SequenceGenerator(name = "payment_seq", sequenceName = "payment_id_seq")
+        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payment_seq")
         var id: Long = 0,
         var ammount: Double? = null,
 

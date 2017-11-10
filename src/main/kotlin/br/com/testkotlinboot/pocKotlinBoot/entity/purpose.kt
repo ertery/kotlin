@@ -3,6 +3,7 @@ package br.com.testkotlinboot.pocKotlinBoot.entity
 import br.com.testkotlinboot.pocKotlinBoot.dto.PersonList
 import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
 import com.fasterxml.jackson.annotation.JsonIgnore
+import org.hibernate.annotations.Cascade
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -12,7 +13,8 @@ import javax.persistence.*
 data class Purpose(
 
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @SequenceGenerator(name = "purpose_seq", sequenceName = "purpose_id_seq")
+        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purpose_seq")
         var purposeId: Long = 0,
 
         var name: String = "",
@@ -35,14 +37,17 @@ data class Purpose(
         @Column(name = "imageurl")
         var imageUrl: String = "",
 
-        var description: String = ""
-) {
-    @JsonIgnore
-    @ManyToMany(mappedBy = "purposes", fetch = FetchType.EAGER)
-    var persons: MutableList<Person> = mutableListOf()
+        var description: String = "",
 
-    @OneToMany(mappedBy = "purpose")
-    var payments: List<Payment> = emptyList()
+        @JsonIgnore
+        @ManyToMany(mappedBy = "purposes", fetch = FetchType.EAGER,
+                cascade = arrayOf(CascadeType.MERGE, CascadeType.PERSIST))
+        @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+        var persons: MutableList<Person> = mutableListOf(),
+
+        @OneToMany(mappedBy = "purpose")
+        var payments: List<Payment> = emptyList()
+) {
 
     fun toDTO(): PurposeRecord = PurposeRecord(
             id = this.purposeId,

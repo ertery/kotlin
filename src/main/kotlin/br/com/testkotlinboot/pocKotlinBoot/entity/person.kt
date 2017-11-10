@@ -11,7 +11,8 @@ import javax.persistence.FetchType
 data class Person(
 
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @SequenceGenerator(name = "person_seq", sequenceName = "person_id_seq")
+        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "person_seq")
         var personId: Long = 0,
 
         var name: String = "",
@@ -28,17 +29,17 @@ data class Person(
         var email: String = "",
 
         @OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
-        var payments: List<Payment> = emptyList()
+        var payments: List<Payment> = emptyList(),
+
+        @ManyToMany(cascade = arrayOf(CascadeType.ALL))
+        @JoinTable(name = "purpose_person", joinColumns = arrayOf(
+                JoinColumn(name = "person_id", nullable = false)),
+                inverseJoinColumns = arrayOf(JoinColumn(name = " purpose_id",
+                        nullable = false)))
+        var purposes: MutableList<Purpose> = mutableListOf()
 ) {
 
-    @ManyToMany(cascade = arrayOf(CascadeType.ALL))
-    @JoinTable(name = "purpose_person", joinColumns = arrayOf(
-            JoinColumn(name = "person_id", nullable = false)),
-            inverseJoinColumns = arrayOf(JoinColumn(name = " purpose_id",
-                    nullable = false)))
-    var purposes: MutableList<Purpose> = mutableListOf()
-
-    @OneToOne()
+    @OneToOne(cascade = arrayOf(CascadeType.PERSIST, CascadeType.MERGE))
     @PrimaryKeyJoinColumn
     var paymentCard: PaymentCard = PaymentCard()
 

@@ -1,7 +1,6 @@
-/*
-CREATE TYPE PAYMENTSTATE AS ENUM ('New', 'InProgress', 'Done', 'Declined');
+/*CREATE TYPE PAYMENTSTATE AS ENUM ('New', 'InProgress', 'Done', 'Declined');
 
-CREATE TYPE PAYMENTMETHOD AS ENUM ('cash', 'clearing', 'debt');
+CREATE TYPE PAYMENTMETHOD AS ENUM ('Cash', 'Clearing', 'Debt');
 
 CREATE TYPE CHANNEL AS ENUM ('iOS', 'Telegramm');
 
@@ -35,14 +34,18 @@ CREATE TABLE person
   purposestate     VARCHAR(255)
 );
 
+ALTER TABLE purpose
+  ADD CONSTRAINT purpose_person_person_id_fk
+FOREIGN KEY (initiator_id) REFERENCES person;
+
 CREATE TABLE purpose_person
 (
-  person_id  BIGSERIAL NOT NULL,
-  purpose_id BIGSERIAL NOT NULL
-    CONSTRAINT payment_person_purpose_id_fkey
-    REFERENCES purpose
+  person_id  BIGSERIAL NOT NULL
     CONSTRAINT payment_person_purpose_id_fkey1
     REFERENCES person,
+  purpose_id BIGSERIAL NOT NULL
+    CONSTRAINT payment_person_purpose_id_fkey
+    REFERENCES purpose,
   CONSTRAINT purpose_person_person_id_purpose_id_pk
   UNIQUE (person_id, purpose_id)
 );
@@ -76,6 +79,5 @@ CREATE TABLE card
   person_id      INTEGER
     CONSTRAINT card_person_id_fkey
     REFERENCES person
-);
+);*/
 
-*/
