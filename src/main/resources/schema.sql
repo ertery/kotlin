@@ -1,4 +1,5 @@
-/*CREATE TYPE PAYMENTSTATE AS ENUM ('New', 'InProgress', 'Done', 'Declined');
+/*
+CREATE TYPE PAYMENTSTATE AS ENUM ('New', 'InProgress', 'Done', 'Declined');
 
 CREATE TYPE PAYMENTMETHOD AS ENUM ('Cash', 'Clearing', 'Debt');
 
@@ -79,5 +80,6 @@ CREATE TABLE card
   person_id      INTEGER
     CONSTRAINT card_person_id_fkey
     REFERENCES person
-);*/
+);
 
+*/
