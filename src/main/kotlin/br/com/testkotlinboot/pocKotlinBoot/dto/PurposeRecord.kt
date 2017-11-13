@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 class PurposeRecord(
         val id: Long, val name: String,
         val currentAmmount: Double = 0.0,
-        val targetAmount: Double = 0.0,
+        val targetAmmount: Double = 0.0,
         val imageUrl: String = "",
         val description: String = "",
         var isInitial: Boolean? = false,

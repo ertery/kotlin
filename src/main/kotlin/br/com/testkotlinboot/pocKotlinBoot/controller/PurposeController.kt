@@ -30,12 +30,8 @@ class PurposeController(val purposeService: PurposeControllerService, val person
     }
 
     @PostMapping("/add")
-    fun addPurpose(@RequestBody newPurpose: Any){
-        val create: CreatePurpose = CreatePurpose( name = "Бабахам", targetAmount = 1000.50,
-                imageUrl = "tukituki", description = "Первый блин комом", initiatorId = 2,
-                persons = mutableListOf(UnregisteredPerson("Трампушка", "88005553535"),
-                        UnregisteredPerson("Путин Хуютин", phoneNumber = "333221")))
-            purposeService.addPurpose(create)
+    fun addPurpose(@RequestBody newPurpose: CreatePurpose){
+            purposeService.addPurpose(newPurpose)
     }
 
 }

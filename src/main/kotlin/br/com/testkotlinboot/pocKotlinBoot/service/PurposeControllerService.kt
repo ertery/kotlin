@@ -34,15 +34,14 @@ class PurposeControllerService(val repository: PurposeRepository, val personRepo
     }
 
     fun addPurpose(purpose: CreatePurpose): Any {
-        var persons: MutableList<Person> = purpose.persons.map { (name, phoneNumber) -> Person(name = name, phoneNumber = phoneNumber, purposes = mutableListOf(Purpose(name = purpose.name, targetAmmount = purpose.targetAmount,
-                description = purpose.description, initiatorId = purpose.initiatorId, finishDate = LocalDateTime.now())))} as MutableList<Person>
+        val persons: MutableList<Person> = purpose.persons.map { (name, phoneNumber) ->
+            Person(name = name, phoneNumber = phoneNumber,
+                    purposes = mutableListOf(Purpose(name = purpose.name, targetAmmount = purpose.targetAmount,
+                            description = purpose.description, initiatorId = purpose.initiatorId, finishDate = LocalDateTime.now())))
+        } as MutableList<Person>
         personRepository.save(persons)
         personRepository.flush()
 
-
-        return mutableListOf<Person>()
-/*        return repository.saveAndFlush(Purpose(name = purpose.name, targetAmmount = purpose.targetAmount,
-                description = purpose.description, initiatorId = purpose.initiatorId, finishDate = LocalDateTime.now(),
-                persons = purpose.persons.map { (name, phoneNumber) -> Person(name = name, phoneNumber = phoneNumber) } as MutableList<Person>*/
+        return mutableListOf(persons)
     }
 }

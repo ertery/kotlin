@@ -44,6 +44,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+	compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.8.4")
 	compile 'postgresql:postgresql:9.1-901-1.jdbc4'
 	compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
 	testCompile('org.springframework.boot:spring-boot-starter-test')
