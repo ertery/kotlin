@@ -56,6 +56,7 @@ data class Purpose(
             targetAmmount = this.targetAmmount!!,
             imageUrl = this.imageUrl,
             description = this.description,
+            isInitial = false,
             persons = this.persons.map { (personId, name1, registrationDate, imagePath) -> PersonList(id = personId, name = name1, imagePath = imagePath)} as MutableList<PersonList>
     )
 }
