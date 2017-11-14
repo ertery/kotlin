@@ -15,9 +15,9 @@ class PersonControllerService(val repository: PersonRepository) {
     fun findByPersonId(id: Long): Any {
         val person: Person = repository.findOne(id)
         val purposes: MutableList<PurposeRecord> = mutableListOf()
-        person.purposes.forEach { purpose ->
-            val record: PurposeRecord = purpose.toDTO()
-            record.isInitial = id == purpose.initiatorId
+        person.purposes.forEach { pp ->
+            val record: PurposeRecord = pp.purpose.toDTO()
+            record.isInitial = id == pp.purpose.initiatorId
             purposes.add(record)
         }
         return purposes

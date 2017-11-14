@@ -5,16 +5,18 @@ import br.com.testkotlinboot.pocKotlinBoot.dto.CreatePurpose
 import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
 import br.com.testkotlinboot.pocKotlinBoot.entity.Person
 import br.com.testkotlinboot.pocKotlinBoot.entity.Purpose
+import br.com.testkotlinboot.pocKotlinBoot.entity.PurposePerson
+import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
+import br.com.testkotlinboot.pocKotlinBoot.repository.PurposePersonRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 
 @Service
 @Transactional
-class PurposeControllerService(val repository: PurposeRepository, val personRepository: PersonRepository) {
+class PurposeControllerService(val repository: PurposeRepository, val personRepository: PersonRepository, val ppRepository: PurposePersonRepository) {
 
     fun getPurposes(): Any {
         val findAll = repository.findAll()
@@ -34,14 +36,25 @@ class PurposeControllerService(val repository: PurposeRepository, val personRepo
     }
 
     fun addPurpose(purpose: CreatePurpose): Any {
-        val persons: MutableList<Person> = purpose.persons.map { (name, phoneNumber) ->
-            Person(name = name, phoneNumber = phoneNumber,
-                    purposes = mutableListOf(Purpose(name = purpose.name, targetAmmount = purpose.targetAmount,
-                            description = purpose.description, initiatorId = purpose.initiatorId, finishDate = LocalDateTime.now())))
-        } as MutableList<Person>
-        personRepository.save(persons)
+        val newPurpose = Purpose(name = purpose.name,
+                targetAmmount = purpose.targetAmmount,
+                finishDate = purpose.finishDate,
+                imageUrl = purpose.imageUrl,
+                description = purpose.description,
+                initiatorId = purpose.initiatorId)
+
+        val forSave: MutableList<Person> = mutableListOf()
+        purpose.persons.forEach {
+            val person = Person(name = it.name, phoneNumber = it.phoneNumber)
+            val pp = PurposePerson(newPurpose, person)
+            pp.purposeState = PersonPurposeState.INITIAL
+            person.purposes.add(pp)
+            forSave.add(person)
+        }
+        repository.save(newPurpose)
+        personRepository.save(forSave)
         personRepository.flush()
 
-        return mutableListOf(persons)
+        return mutableListOf(forSave)
     }
 }

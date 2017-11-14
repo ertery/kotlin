@@ -29,7 +29,7 @@ data class Purpose(
         var targetAmmount: Double? = null,
 
         @Column(name = "currentammount")
-        var currentAmmount: Double = Double.MIN_VALUE,
+        var currentAmmount: Double = 0.0,
 
         @Column
         var initiatorId: Long = -1,
@@ -40,10 +40,10 @@ data class Purpose(
         var description: String = "",
 
         @JsonIgnore
-        @ManyToMany(mappedBy = "purposes", fetch = FetchType.EAGER,
+        @OneToMany(mappedBy = "purpose", fetch = FetchType.EAGER,
                 cascade = arrayOf(CascadeType.MERGE, CascadeType.PERSIST))
         @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-        var persons: MutableList<Person> = mutableListOf(),
+        var persons: MutableList<PurposePerson> = mutableListOf(),
 
         @OneToMany(mappedBy = "purpose")
         var payments: List<Payment> = emptyList()
@@ -57,6 +57,8 @@ data class Purpose(
             imageUrl = this.imageUrl,
             description = this.description,
             isInitial = false,
-            persons = this.persons.map { (personId, name1, registrationDate, imagePath) -> PersonList(id = personId, name = name1, imagePath = imagePath)} as MutableList<PersonList>
+            persons = this.persons.map { pp -> PersonList(id = pp.person.personId,
+                    name = pp.person.name,
+                    imagePath = pp.person.imagePath)} as MutableList<PersonList>
     )
 }

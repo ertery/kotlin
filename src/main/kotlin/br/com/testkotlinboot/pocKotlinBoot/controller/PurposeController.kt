@@ -29,7 +29,7 @@ class PurposeController(val purposeService: PurposeControllerService, val person
         }
     }
 
-    @PostMapping("/add")
+    @PostMapping("/")
     fun addPurpose(@RequestBody newPurpose: CreatePurpose){
             purposeService.addPurpose(newPurpose)
     }

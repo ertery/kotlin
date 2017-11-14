@@ -31,20 +31,12 @@ data class Person(
         @OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
         var payments: List<Payment> = emptyList(),
 
-        @ManyToMany(cascade = arrayOf(CascadeType.ALL))
-        @JoinTable(name = "purpose_person", joinColumns = arrayOf(
-                JoinColumn(name = "person_id", nullable = false)),
-                inverseJoinColumns = arrayOf(JoinColumn(name = " purpose_id",
-                        nullable = false)))
-        var purposes: MutableList<Purpose> = mutableListOf()
+        @OneToMany(mappedBy = "person", cascade = arrayOf(CascadeType.ALL))
+        var purposes: MutableList<PurposePerson> = mutableListOf()
 ) {
 
     @OneToOne(cascade = arrayOf(CascadeType.PERSIST, CascadeType.MERGE))
     @PrimaryKeyJoinColumn
     var paymentCard: PaymentCard = PaymentCard()
-
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "purposestate")
-    lateinit var purposeState: PersonPurposeState
 }
 
