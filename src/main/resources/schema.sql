@@ -31,9 +31,11 @@ CREATE TABLE person
   registrationdate TIMESTAMP,
   imagepath        VARCHAR(255),
   phonenumber      VARCHAR(255),
-  email            VARCHAR(255),
-  purposestate     VARCHAR(255)
+  email            VARCHAR(255)
 );
+
+CREATE INDEX person_phonenumber_index
+  ON person (phonenumber);
 
 ALTER TABLE purpose
   ADD CONSTRAINT purpose_person_person_id_fk
@@ -41,12 +43,13 @@ FOREIGN KEY (initiator_id) REFERENCES person;
 
 CREATE TABLE purpose_person
 (
-  person_id  BIGSERIAL NOT NULL
+  person_id     BIGSERIAL NOT NULL
     CONSTRAINT payment_person_purpose_id_fkey1
     REFERENCES person,
-  purpose_id BIGSERIAL NOT NULL
+  purpose_id    BIGSERIAL NOT NULL
     CONSTRAINT payment_person_purpose_id_fkey
     REFERENCES purpose,
+  purpose_state VARCHAR(255),
   CONSTRAINT purpose_person_person_id_purpose_id_pk
   UNIQUE (person_id, purpose_id)
 );
