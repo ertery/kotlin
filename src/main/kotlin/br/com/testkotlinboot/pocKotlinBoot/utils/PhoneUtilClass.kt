@@ -5,7 +5,7 @@ class PhoneUtilClass {
     companion object {
         fun format(phoneNumber: String) : String {
            val re = Regex("\\D")
-           return re.replace(phoneNumber, "").removePrefix("7")
+           return re.replace(phoneNumber, "").removePrefix("7").removePrefix("8")
         }
     }
 

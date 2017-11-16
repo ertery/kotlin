@@ -15,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class PersonControllerService(val personRepository: PersonRepository) {
 
-    val LOGGER = LoggerFactory.getLogger(PersonControllerService::class.java.name)!!
+
+    private val LOGGER = LoggerFactory.getLogger(PersonControllerService::class.java)
 
 
     @Transactional
@@ -41,7 +42,11 @@ class PersonControllerService(val personRepository: PersonRepository) {
     }
 
     fun createPerson(createPerson: CreatePerson): Long {
-        if (personRepository.findByPhoneNumber(PhoneUtilClass.format(createPerson.phoneNumber)) != null) return -1
+        if (personRepository.findByPhoneNumber(PhoneUtilClass.format(createPerson.phoneNumber)) != null ||
+                personRepository.findByFacebookId(createPerson.facebookId) != null) {
+            LOGGER.error("Person with phone ${createPerson.phoneNumber} and facebookId ${createPerson.facebookId} already exist")
+            return -1
+        }
 
         val person = Person(name = createPerson.name, imagePath = createPerson.imagePath, email = createPerson.email,
                 facebookId = createPerson.facebookId, phoneNumber = PhoneUtilClass.format(createPerson.phoneNumber))
