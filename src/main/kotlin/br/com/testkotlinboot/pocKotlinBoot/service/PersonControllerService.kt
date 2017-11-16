@@ -1,10 +1,12 @@
 package br.com.testkotlinboot.pocKotlinBoot.service
 
+import br.com.testkotlinboot.pocKotlinBoot.dto.CreatePerson
 import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
 import br.com.testkotlinboot.pocKotlinBoot.dto.StatusUpdate
 import br.com.testkotlinboot.pocKotlinBoot.entity.Person
 import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
+import br.com.testkotlinboot.pocKotlinBoot.utils.PhoneUtilClass
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -36,6 +38,16 @@ class PersonControllerService(val personRepository: PersonRepository) {
         person.purposes.filter { (purpose) -> purpose.purposeId == status.purposeId }.
                 forEach { it.purposeState = PersonPurposeState.valueOf(status.state.toUpperCase()) }
         personRepository.save(person)
+    }
+
+    fun createPerson(createPerson: CreatePerson): Long {
+        if (personRepository.findByPhoneNumber(PhoneUtilClass.format(createPerson.phoneNumber)) != null) return -1
+
+        val person = Person(name = createPerson.name, imagePath = createPerson.imagePath, email = createPerson.email,
+                facebookId = createPerson.facebookId, phoneNumber = PhoneUtilClass.format(createPerson.phoneNumber))
+        val savedPerson = personRepository.save(person)
+
+        return savedPerson.personId
     }
 
 

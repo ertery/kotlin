@@ -33,7 +33,10 @@ data class Person(
         var payments: MutableList<Payment> = mutableListOf(),
 
         @OneToMany(mappedBy = "person", cascade = arrayOf(CascadeType.ALL))
-        var purposes: MutableList<PurposePerson> = mutableListOf()
+        var purposes: MutableList<PurposePerson> = mutableListOf(),
+
+        @Column(name = "facebookid")
+        var facebookId: String = " "
 ) {
     @OneToOne(mappedBy = "person", cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY)
     var paymentCard: PaymentCard = PaymentCard()
