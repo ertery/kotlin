@@ -1,10 +1,12 @@
 package br.com.testkotlinboot.pocKotlinBoot.entity
 
+import br.com.testkotlinboot.pocKotlinBoot.dto.PaymentList
 import br.com.testkotlinboot.pocKotlinBoot.dto.PersonList
 import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.Cascade
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.persistence.*
 
 
@@ -20,7 +22,7 @@ data class Purpose(
         var name: String = "",
 
         @Column(name = "creationdate")
-        var creationDate: LocalDateTime = LocalDateTime.now(),
+        var creationDate: LocalDateTime = LocalDateTime.now(ZoneId.of("Europe/Moscow")),
 
         @Column(name = "finishdate")
         var finishDate: LocalDateTime? = null,
@@ -46,7 +48,7 @@ data class Purpose(
         var persons: MutableList<PurposePerson> = mutableListOf(),
 
         @OneToMany(mappedBy = "purpose")
-        var payments: List<Payment> = emptyList()
+        var payments: MutableList<Payment> = mutableListOf()
 ) {
 
     fun toDTO(): PurposeRecord = PurposeRecord(
@@ -57,8 +59,16 @@ data class Purpose(
             imageUrl = this.imageUrl,
             description = this.description,
             isInitial = false,
-            persons = this.persons.map { pp -> PersonList(id = pp.person.personId,
-                    name = pp.person.name,
-                    imagePath = pp.person.imagePath)} as MutableList<PersonList>
+            persons = persons.map { pp ->
+                PersonList(id = pp.person.personId,
+                        name = pp.person.name,
+                        imagePath = pp.person.imagePath,
+                        payments = pp.person.payments.map { payment ->
+                            PaymentList(id = payment.id,
+                                    ammount = payment.ammount!!,
+                                    paymentDate = payment.paymentDate,
+                                    paymentMethod = payment.paymentMethod.toString())
+                        } as MutableList<PaymentList>)
+            } as MutableList<PersonList>
     )
 }

@@ -47,5 +47,7 @@ dependencies {
 	compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.8.4")
 	compile 'postgresql:postgresql:9.1-901-1.jdbc4'
 	compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+	compile 'org.slf4j:jcl-over-slf4j:1.7.12'
+	compile 'ch.qos.logback:logback-classic:1.2.3'
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

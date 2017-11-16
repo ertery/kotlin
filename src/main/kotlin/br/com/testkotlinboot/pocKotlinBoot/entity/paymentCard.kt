@@ -22,6 +22,7 @@ data class PaymentCard(
 
 ) {
     @JsonIgnore
-    @OneToOne(mappedBy = "paymentCard")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="person_id")
     lateinit var person: Person
 }

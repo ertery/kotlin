@@ -2,6 +2,7 @@ package br.com.testkotlinboot.pocKotlinBoot.entity
 
 import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.persistence.*
 import javax.persistence.FetchType
 
@@ -18,7 +19,7 @@ data class Person(
         var name: String = "",
 
         @Column(name = "registrationdate")
-        var registrationDate: LocalDateTime = LocalDateTime.now(),
+        var registrationDate: LocalDateTime = LocalDateTime.now(ZoneId.of("Europe/Moscow")),
 
         @Column(name = "imagepath")
         var imagePath: String = "",
@@ -29,14 +30,12 @@ data class Person(
         var email: String = "",
 
         @OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
-        var payments: List<Payment> = emptyList(),
+        var payments: MutableList<Payment> = mutableListOf(),
 
         @OneToMany(mappedBy = "person", cascade = arrayOf(CascadeType.ALL))
         var purposes: MutableList<PurposePerson> = mutableListOf()
 ) {
-
-    @OneToOne(cascade = arrayOf(CascadeType.PERSIST, CascadeType.MERGE))
-    @PrimaryKeyJoinColumn
+    @OneToOne(mappedBy = "person", cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY)
     var paymentCard: PaymentCard = PaymentCard()
 }
 
