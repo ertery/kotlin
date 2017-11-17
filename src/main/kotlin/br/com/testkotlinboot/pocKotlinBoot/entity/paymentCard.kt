@@ -1,6 +1,7 @@
 package br.com.testkotlinboot.pocKotlinBoot.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import java.time.LocalDate
 import java.util.*
 import javax.persistence.*
 
@@ -13,7 +14,7 @@ data class PaymentCard(
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "card_seq")
         var id: Long = 0,
 
-        var validity: Date? = null,
+        var validity: LocalDate? = null,
 
         @Column(name = "number")
         var cardNumber: String = "",
