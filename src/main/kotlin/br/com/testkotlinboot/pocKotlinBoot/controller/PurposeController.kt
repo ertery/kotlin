@@ -34,4 +34,9 @@ class PurposeController(val purposeService: PurposeControllerService, val person
            return purposeService.addPurpose(newPurpose)
     }
 
+    @PostMapping("/{id}/person")
+    fun addPersonsToPurpose(@PathVariable id: Long,
+                            @RequestBody addedPersons: MutableList<UnregisteredPerson>){
+            purposeService.addPersonsToPurpose(id, addedPersons)
+    }
 }

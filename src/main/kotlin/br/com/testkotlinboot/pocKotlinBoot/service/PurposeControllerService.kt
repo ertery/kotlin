@@ -1,10 +1,7 @@
 package br.com.testkotlinboot.pocKotlinBoot.service
 
 
-import br.com.testkotlinboot.pocKotlinBoot.dto.CreatePurpose
-import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
-import br.com.testkotlinboot.pocKotlinBoot.dto.SavePurposeResponse
-import br.com.testkotlinboot.pocKotlinBoot.dto.SavedPerson
+import br.com.testkotlinboot.pocKotlinBoot.dto.*
 import br.com.testkotlinboot.pocKotlinBoot.entity.*
 import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
@@ -51,7 +48,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         val notSaved: MutableList<Person> = mutableListOf()
 
         purpose.persons.forEach {
-            if (personRepository.findByPhoneNumber(it.phoneNumber) != null) {
+            if (personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber)) != null) {
                 LOGGER.error("Person with such phone number {} already exists", it.phoneNumber)
                 notSaved.add(Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber)))
             } else {
@@ -68,8 +65,52 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         }
 
         val savedPurpose = purposeRepository.save(newPurpose)
-        val savedPersons  = personRepository.save(forSave)
+        val savedPersons = personRepository.save(forSave)
 
-        return mutableListOf(SavePurposeResponse(savedPurpose.purposeId, savedPersons.map { sp -> SavedPerson(sp.personId, PhoneUtilClass.format(sp.phoneNumber))} as MutableList<SavedPerson>))
+        return mutableListOf(SavePurposeResponse(savedPurpose.purposeId, savedPersons.map { sp -> SavedPerson(sp.personId, PhoneUtilClass.format(sp.phoneNumber)) } as MutableList<SavedPerson>))
+    }
+
+    fun addPersonsToPurpose(purposeId: Long, addedPersons: MutableList<UnregisteredPerson>): Long {
+
+        val purpose = purposeRepository.findOne(purposeId)
+        if (purpose == null) {
+            LOGGER.error("There are no purpose with id $purposeId")
+            return -1
+        }
+        val updateList = purpose.persons.filter { (purpose1) ->
+            purpose1.purposeId == purposeId
+        }
+
+        if (updateList.size > 1) {
+            LOGGER.error("There are multiple purposes with id $purposeId")
+            return -1
+        }
+
+        val forSave: MutableList<Person> = mutableListOf()
+
+        addedPersons.forEach {
+            val person = personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber))
+            if (person != null) {
+                val pp = PurposePerson(purpose, person)
+                pp.purposeState = PersonPurposeState.INITIAL
+                person.purposes.add(pp)
+                LOGGER.info("Person with id ${person.personId} was successfully join to purpose ${purpose.name}")
+            } else {
+                val personSave = Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
+                val pp = PurposePerson(purpose, personSave)
+                val paymentCard = PaymentCard()
+                paymentCard.person = personSave
+                personSave.paymentCard = paymentCard
+                pp.purposeState = PersonPurposeState.INITIAL
+                personSave.purposes.add(pp)
+                forSave.add(personSave)
+                LOGGER.info("Person with phone number {} was successfully join to purpose ${purpose.name}", PhoneUtilClass.format(it.phoneNumber))
+            }
+        }
+
+        purposeRepository.save(purpose)
+        personRepository.save(forSave)
+
+        return 0
     }
 }

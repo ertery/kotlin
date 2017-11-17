@@ -1,6 +1,6 @@
 package br.com.testkotlinboot.pocKotlinBoot.controller
 
-import br.com.testkotlinboot.pocKotlinBoot.dto.CreatePerson
+import br.com.testkotlinboot.pocKotlinBoot.dto.PersonDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.StatusUpdate
 import br.com.testkotlinboot.pocKotlinBoot.service.PersonControllerService
 import org.springframework.http.HttpStatus
@@ -18,7 +18,7 @@ class PersonController(val personService: PersonControllerService) {
     fun updateStatus(@RequestBody status: StatusUpdate) = personService.updateStatus(status)
 
     @PostMapping("")
-    fun savePerson(@RequestBody createPerson: CreatePerson): Long {
+    fun savePerson(@RequestBody createPerson: PersonDTO): Long {
           return personService.createPerson(createPerson)
     }
 

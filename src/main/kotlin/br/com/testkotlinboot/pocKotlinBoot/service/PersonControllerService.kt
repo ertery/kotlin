@@ -1,6 +1,6 @@
 package br.com.testkotlinboot.pocKotlinBoot.service
 
-import br.com.testkotlinboot.pocKotlinBoot.dto.CreatePerson
+import br.com.testkotlinboot.pocKotlinBoot.dto.PersonDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
 import br.com.testkotlinboot.pocKotlinBoot.dto.StatusUpdate
 import br.com.testkotlinboot.pocKotlinBoot.entity.Person
@@ -41,7 +41,7 @@ class PersonControllerService(val personRepository: PersonRepository) {
         personRepository.save(person)
     }
 
-    fun createPerson(createPerson: CreatePerson): Long {
+    fun createPerson(createPerson: PersonDTO): Long {
         if (personRepository.findByPhoneNumber(PhoneUtilClass.format(createPerson.phoneNumber)) != null ||
                 personRepository.findByFacebookId(createPerson.facebookId) != null) {
             LOGGER.error("Person with phone ${createPerson.phoneNumber} and facebookId ${createPerson.facebookId} already exist")
