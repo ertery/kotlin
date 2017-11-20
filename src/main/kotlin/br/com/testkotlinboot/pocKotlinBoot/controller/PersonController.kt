@@ -3,7 +3,6 @@ package br.com.testkotlinboot.pocKotlinBoot.controller
 import br.com.testkotlinboot.pocKotlinBoot.dto.CardDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.PersonDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.StatusUpdate
-import br.com.testkotlinboot.pocKotlinBoot.dto.UnregisteredPerson
 import br.com.testkotlinboot.pocKotlinBoot.service.PersonControllerService
 import org.springframework.web.bind.annotation.*
 
@@ -15,8 +14,11 @@ class PersonController(val personService: PersonControllerService) {
     @GetMapping("/{id}")
     fun getPurposeById(@PathVariable id: Long) = personService.findByPersonId(id)
 
-    @PutMapping("/status")
-    fun updateStatus(@RequestBody status: StatusUpdate) = personService.updateStatus(status)
+    @PutMapping("/state")
+    fun updateState(@RequestBody status: StatusUpdate) = personService.updateState(status)
+
+    @PostMapping("/state")
+    fun addState(@RequestBody state: StatusUpdate) = personService.addState(state)
 
     @PostMapping("")
     fun savePerson(@RequestBody createPerson: PersonDTO): Long {

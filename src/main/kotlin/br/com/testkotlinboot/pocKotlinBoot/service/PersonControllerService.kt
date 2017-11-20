@@ -6,8 +6,10 @@ import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
 import br.com.testkotlinboot.pocKotlinBoot.dto.StatusUpdate
 import br.com.testkotlinboot.pocKotlinBoot.entity.PaymentCard
 import br.com.testkotlinboot.pocKotlinBoot.entity.Person
+import br.com.testkotlinboot.pocKotlinBoot.entity.PurposePerson
 import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
+import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import br.com.testkotlinboot.pocKotlinBoot.utils.PhoneUtilClass
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -17,7 +19,7 @@ import java.time.format.DateTimeFormatter
 
 
 @Service
-class PersonControllerService(val personRepository: PersonRepository) {
+class PersonControllerService(val personRepository: PersonRepository,val purposeRepository: PurposeRepository) {
 
 
     private val LOGGER = LoggerFactory.getLogger(PersonControllerService::class.java)
@@ -38,7 +40,7 @@ class PersonControllerService(val personRepository: PersonRepository) {
     }
 
     @Transactional
-    fun updateStatus(status: StatusUpdate) {
+    fun updateState(status: StatusUpdate) {
         val person = personRepository.findOne(status.personId)
         person.purposes.filter { (purpose) -> purpose.purposeId == status.purposeId }.
                 forEach { it.purposeState = PersonPurposeState.valueOf(status.state.toUpperCase()) }
@@ -76,6 +78,25 @@ class PersonControllerService(val personRepository: PersonRepository) {
         }
 
         return personRepository.save(person).paymentCard?.id
+    }
+
+    @Transactional
+    fun addState(state: StatusUpdate): Any {
+        val person  = personRepository.findOne(state.personId)
+        val purpose = purposeRepository.findOne(state.purposeId)
+
+        if (person == null || purpose == null) return -1
+
+        val purposePerson = PurposePerson(purpose, person)
+        purposePerson.purposeState = PersonPurposeState.valueOf(state.state.toUpperCase())
+
+        person.purposes.add(purposePerson)
+
+        purposeRepository.saveAndFlush(purpose)
+        personRepository.saveAndFlush(person)
+
+
+        return 0
     }
 
 
