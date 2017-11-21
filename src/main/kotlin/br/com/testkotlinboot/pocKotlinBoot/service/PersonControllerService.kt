@@ -43,14 +43,8 @@ class PersonControllerService(val personRepository: PersonRepository,val purpose
     fun findPersonByFacebookId(facebookId: String): Any {
         LOGGER.info("Get purposes by facebookId: $facebookId")
         val person = personRepository.findByFacebookId(facebookId)
-        val purposes: MutableList<PurposeRecord> = mutableListOf()
-        person?.purposes?.forEach { pp ->
-            val record: PurposeRecord = pp.purpose.toDTO()
-            record.isInitial = PersonPurposeState.INITIAL == pp.purposeState
-            purposes.add(record)
-        }
-        LOGGER.info("SUCCESSFUL: Purposes were returned : {}", purposes)
-        return purposes
+        return PersonDTO(name = person?.name!!,  phoneNumber = person.phoneNumber, imagePath = person.imagePath,
+                email = person.email, facebookId = person.facebookId)
     }
 
     @Transactional
