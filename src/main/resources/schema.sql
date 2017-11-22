@@ -31,7 +31,8 @@ CREATE TABLE person
   registrationdate TIMESTAMP,
   imagepath        VARCHAR(255),
   phonenumber      VARCHAR(255),
-  email            VARCHAR(255)
+  email            VARCHAR(255),
+  facebookid       VARCHAR(255)
 );
 
 CREATE INDEX person_phonenumber_index
@@ -67,9 +68,9 @@ CREATE TABLE payment
   person_id     INTEGER
     CONSTRAINT payment_person_id_fkey
     REFERENCES person,
-  paymentmethod PAYMENTMETHOD,
-  state         PAYMENTSTATE,
-  channel       CHANNEL
+  paymentmethod VARCHAR(255),
+  state         VARCHAR(255),
+  channel       VARCHAR(255)
 );
 
 CREATE TABLE card
@@ -80,8 +81,8 @@ CREATE TABLE card
   cardholdername VARCHAR(255),
   number         VARCHAR(255),
   validity       DATE,
-  person_id      INTEGER
-    CONSTRAINT card_person_id_fkey
+  person_id      BIGINT
+    CONSTRAINT card_person_id_fk
     REFERENCES person
 );
 
