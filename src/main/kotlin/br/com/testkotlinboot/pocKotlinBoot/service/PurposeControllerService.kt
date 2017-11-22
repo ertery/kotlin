@@ -3,21 +3,24 @@ package br.com.testkotlinboot.pocKotlinBoot.service
 
 import br.com.testkotlinboot.pocKotlinBoot.dto.*
 import br.com.testkotlinboot.pocKotlinBoot.entity.*
-import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
-import br.com.testkotlinboot.pocKotlinBoot.repository.PurposePersonRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import br.com.testkotlinboot.pocKotlinBoot.utils.PhoneUtilClass
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import javax.annotation.Resource
 
 
-@Service
-@Transactional
+@Service("proxy")
+
 class PurposeControllerService(val purposeRepository: PurposeRepository, val personRepository: PersonRepository) {
 
     val LOGGER = LoggerFactory.getLogger(PurposeControllerService::class.java.name)
+
+    @Resource(name = "proxy")
+    lateinit var selfRef: PurposeControllerService
 
     fun getPurposes(): Any {
         val findAll = purposeRepository.findAll()
@@ -36,8 +39,9 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         return findByName?.toDTO()
     }
 
+    @Transactional
     fun addPurpose(purpose: CreatePurpose): Any {
-        val newPurpose = Purpose(name = purpose.name,
+        val createPurpose = Purpose(name = purpose.name,
                 targetAmmount = purpose.targetAmmount,
                 finishDate = purpose.finishDate,
                 imageUrl = purpose.imageUrl,
@@ -45,31 +49,37 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
                 initiatorId = purpose.initiatorId)
 
         val forSave: MutableList<Person> = mutableListOf()
-        val notSaved: MutableList<Person> = mutableListOf()
+
+        val newPurpose = selfRef.savePurpose(createPurpose)!!
 
         purpose.persons.forEach {
-            if (personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber)) != null) {
-                LOGGER.error("Person with such phone number {} already exists", it.phoneNumber)
-                notSaved.add(Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber)))
+            val existPerson = personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber))
+            if (existPerson != null) {
+                val pp = PurposePerson(newPurpose, existPerson)
+                existPerson.purposes.add(pp)
+                LOGGER.error("Person with such phone number ${it.phoneNumber} already present in db")
+                forSave.add(existPerson)
             } else {
                 val person = Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
-                val pp = PurposePerson(newPurpose, person)
-                val paymentCard = PaymentCard()
-                paymentCard.person = person
-                person.paymentCard = paymentCard
-                pp.purposeState = PersonPurposeState.INITIAL
-                person.purposes.add(pp)
-                forSave.add(person)
-                LOGGER.info("Person with phone number {} was successfully added for purpose {}", PhoneUtilClass.format(it.phoneNumber), purpose.name)
+                if (!forSave.any { p -> p.phoneNumber == person.phoneNumber }) {
+                    val pp = PurposePerson(newPurpose, person)
+                    val paymentCard = PaymentCard()
+                    paymentCard.person = person
+                    person.paymentCard = paymentCard
+                    person.purposes.add(pp)
+                    forSave.add(person)
+                    LOGGER.info("Person with phone number ${PhoneUtilClass.format(it.phoneNumber)} was successfully added for purpose ${purpose.name}")
+                }
             }
         }
 
-        val savedPurpose = purposeRepository.save(newPurpose)
+        val savedPurpose = purposeRepository.saveAndFlush(newPurpose)
         val savedPersons = personRepository.save(forSave)
 
         return mutableListOf(SavePurposeResponse(savedPurpose.purposeId, savedPersons.map { sp -> SavedPerson(sp.personId, PhoneUtilClass.format(sp.phoneNumber)) } as MutableList<SavedPerson>))
     }
 
+    @Transactional
     fun addPersonsToPurpose(purposeId: Long, addedPersons: MutableList<UnregisteredPerson>): Long {
 
         val purpose = purposeRepository.findOne(purposeId)
@@ -92,19 +102,19 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
             val person = personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber))
             if (person != null) {
                 val pp = PurposePerson(purpose, person)
-                pp.purposeState = PersonPurposeState.INITIAL
                 person.purposes.add(pp)
                 LOGGER.info("Person with id ${person.personId} was successfully join to purpose ${purpose.name}")
             } else {
                 val personSave = Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
-                val pp = PurposePerson(purpose, personSave)
-                val paymentCard = PaymentCard()
-                paymentCard.person = personSave
-                personSave.paymentCard = paymentCard
-                pp.purposeState = PersonPurposeState.INITIAL
-                personSave.purposes.add(pp)
-                forSave.add(personSave)
-                LOGGER.info("Person with phone number {} was successfully join to purpose ${purpose.name}", PhoneUtilClass.format(it.phoneNumber))
+                if (!forSave.any { p -> p.phoneNumber == personSave.phoneNumber }) {
+                    val pp = PurposePerson(purpose, personSave)
+                    val paymentCard = PaymentCard()
+                    paymentCard.person = personSave
+                    personSave.paymentCard = paymentCard
+                    personSave.purposes.add(pp)
+                    forSave.add(personSave)
+                    LOGGER.info("Person with phone number ${PhoneUtilClass.format(it.phoneNumber)} was successfully join to purpose ${purpose.name}")
+                }
             }
         }
 
@@ -112,5 +122,10 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         personRepository.save(forSave)
 
         return 0
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun savePurpose(purpose: Purpose): Purpose? {
+        return purposeRepository.saveAndFlush(purpose)
     }
 }

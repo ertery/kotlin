@@ -44,7 +44,7 @@ class PersonControllerService(val personRepository: PersonRepository,val purpose
         LOGGER.info("Get purposes by facebookId: $facebookId")
         val person = personRepository.findByFacebookId(facebookId)
         return PersonDTO(name = person?.name!!,  phoneNumber = person.phoneNumber, imagePath = person.imagePath,
-                email = person.email, facebookId = person.facebookId)
+                email = person.email, facebookId = person.facebookId, id = person.personId)
     }
 
     @Transactional

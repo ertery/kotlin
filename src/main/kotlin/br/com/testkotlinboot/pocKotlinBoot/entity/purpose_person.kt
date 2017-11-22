@@ -1,7 +1,6 @@
 package br.com.testkotlinboot.pocKotlinBoot.entity
 
-import br.com.testkotlinboot.pocKotlinBoot.dto.PersonRecord
-import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
+
 import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import java.io.Serializable
 import javax.persistence.*
@@ -18,8 +17,9 @@ data class PurposePerson(
         @JoinColumn(name = "person_id")
         val person: Person = Person()
 ) : Serializable {
+
     @Enumerated(value = EnumType.STRING)
     @Column(name = "purpose_state")
-    lateinit var purposeState: PersonPurposeState
+    var purposeState: PersonPurposeState = PersonPurposeState.INVITESEND
 
 }
