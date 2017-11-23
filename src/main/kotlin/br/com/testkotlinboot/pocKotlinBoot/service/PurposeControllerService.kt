@@ -3,6 +3,7 @@ package br.com.testkotlinboot.pocKotlinBoot.service
 
 import br.com.testkotlinboot.pocKotlinBoot.dto.*
 import br.com.testkotlinboot.pocKotlinBoot.entity.*
+import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import br.com.testkotlinboot.pocKotlinBoot.utils.PhoneUtilClass
@@ -52,12 +53,22 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
 
         val newPurpose = selfRef.savePurpose(createPurpose)!!
 
+        val initPerson = personRepository.findOne(purpose.initiatorId)
+
+        if (initPerson != null) {
+            val pp = PurposePerson(newPurpose, initPerson)
+            pp.purposeState = PersonPurposeState.INITIAL
+            initPerson.purposes.add(pp)
+            forSave.add(initPerson)
+            LOGGER.info("Person with id ${initPerson.personId} will be init person for new purpose with name ${purpose.name}")
+        }
+
         purpose.persons.forEach {
             val existPerson = personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber))
             if (existPerson != null) {
                 val pp = PurposePerson(newPurpose, existPerson)
                 existPerson.purposes.add(pp)
-                LOGGER.error("Person with such phone number ${it.phoneNumber} already present in db")
+                LOGGER.info("Person with such phone number ${it.phoneNumber} already present in db")
                 forSave.add(existPerson)
             } else {
                 val person = Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
