@@ -1,7 +1,7 @@
 package br.com.testkotlinboot.pocKotlinBoot.repository
 
 import br.com.testkotlinboot.pocKotlinBoot.entity.Payment
-import org.springframework.data.repository.CrudRepository
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface PaymentRepository : CrudRepository<Payment, Long> {
+interface PaymentRepository : JpaRepository<Payment, Long> {
 }

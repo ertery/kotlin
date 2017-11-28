@@ -1,6 +1,5 @@
 package br.com.testkotlinboot.pocKotlinBoot.entity
 
-import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import java.time.LocalDateTime
 import java.time.ZoneId
 import javax.persistence.*
@@ -39,6 +38,6 @@ data class Person(
         var facebookId: String = " "
 ) {
     @OneToOne(mappedBy = "person", cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY)
-    var paymentCard: PaymentCard? = PaymentCard()
+    var paymentCard: PaymentCard = PaymentCard()
 }
 

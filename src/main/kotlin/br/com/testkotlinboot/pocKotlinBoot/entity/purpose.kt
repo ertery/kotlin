@@ -51,7 +51,7 @@ data class Purpose(
         var payments: MutableList<Payment> = mutableListOf()
 ) {
 
-    fun toDTO(): PurposeRecord = PurposeRecord(
+    fun toDTO() = PurposeRecord(
             id = this.purposeId,
             name = this.name,
             currentAmmount = this.currentAmmount,
@@ -65,7 +65,7 @@ data class Purpose(
                         imagePath = pp.person.imagePath,
                         payments = pp.person.payments.map { payment ->
                             PaymentList(id = payment.id,
-                                    ammount = payment.ammount!!,
+                                    ammount = payment.amount!!,
                                     paymentDate = payment.paymentDate,
                                     paymentMethod = payment.paymentMethod.toString())
                         } as MutableList<PaymentList>)
