@@ -3,6 +3,7 @@ package br.com.testkotlinboot.pocKotlinBoot.controller
 import br.com.testkotlinboot.pocKotlinBoot.dto.CreatePurpose
 import br.com.testkotlinboot.pocKotlinBoot.dto.PaymentDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.UnregisteredPerson
+import br.com.testkotlinboot.pocKotlinBoot.dto.UrlResponse
 import br.com.testkotlinboot.pocKotlinBoot.entity.Purpose
 import br.com.testkotlinboot.pocKotlinBoot.service.PaymentControllerService
 import br.com.testkotlinboot.pocKotlinBoot.service.PersonControllerService
@@ -51,7 +52,6 @@ class PurposeController(val purposeService: PurposeControllerService,
     @PostMapping("{purposeId}/person/{personId}/payment")
     fun receivePayment(@PathVariable purposeId: Long,
                        @PathVariable personId: Long,
-                       @RequestBody newPayment: PaymentDTO): String {
-      return pageUrl + paymentService.createNewPayment(purposeId, personId, newPayment)?.id
-    }
+                       @RequestBody newPayment: PaymentDTO): UrlResponse =
+            UrlResponse( pageUrl + paymentService.createNewPayment(purposeId, personId, newPayment)?.id)
 }
