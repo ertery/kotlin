@@ -29,19 +29,14 @@ class PurposeController(val purposeService: PurposeControllerService,
 
     @GetMapping("/find")
     fun getPurposeByName(@RequestParam(value = "byName", required = false) name: String?,
-                         @RequestParam(value = "byId", required = false) id: Long?): Any {
-
-        return when {
-            name != null -> purposeService.findPurposeByName(name)
-            id != null -> personService.findByPersonId(id)
-            else -> mutableListOf<String>()
-        }
-    }
+                         @RequestParam(value = "byId", required = false) id: Long?): Any = when {
+                             name != null -> purposeService.findPurposeByName(name)
+                             id != null -> personService.findByPersonId(id)
+                             else -> mutableListOf<String>()
+                         }
 
     @PostMapping("/")
-    fun addPurpose(@RequestBody newPurpose: CreatePurpose): Any {
-           return purposeService.addPurpose(newPurpose)
-    }
+    fun addPurpose(@RequestBody newPurpose: CreatePurpose): Any = purposeService.addPurpose(newPurpose)
 
     @PostMapping("/{id}/person")
     fun addPersonsToPurpose(@PathVariable id: Long,

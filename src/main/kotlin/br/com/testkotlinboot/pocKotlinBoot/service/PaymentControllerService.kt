@@ -33,6 +33,9 @@ class PaymentControllerService(val paymentRepository: PaymentRepository,val  per
 
         person.payments.add(payment)
         purpose.payments.add(payment)
+        purpose.currentAmmount += newPayment.ammount
+
+        purposeRepository.saveAndFlush(purpose)
 
         return paymentRepository.saveAndFlush(payment)
     }
