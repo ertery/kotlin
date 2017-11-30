@@ -8,4 +8,5 @@ data class PaymentResponseDTO(val amount: Double,
                               val paymentDate: LocalDate,
                               val cardNumber: String,
                               val purposeDescription: String,
-                              val personName: String)
+                              val personName: String,
+                              val personId: Long)

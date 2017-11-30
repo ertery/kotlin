@@ -48,6 +48,7 @@ data class Payment(
             paymentDate = this.paymentDate,
             cardNumber = CardUtilClass.maskNumber(this.person.paymentCard.cardNumber),
             purposeDescription = this.purpose.description,
-            personName = this.person.name
+            personName = this.person.name,
+            personId = this.person.personId
     )
 }

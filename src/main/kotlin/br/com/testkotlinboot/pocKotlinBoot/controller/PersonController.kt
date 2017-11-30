@@ -30,8 +30,8 @@ class PersonController(val personService: PersonControllerService) {
 
     @PostMapping("/{id}/card")
     fun saveCardForPerson(@PathVariable id: Long,
-                          @RequestBody card: CardDTO): Long? {
-        return personService.addCard(id, card)
-    }
+                          @RequestBody card: CardDTO): Long? = personService.addCard(id, card)
+
+
 
 }

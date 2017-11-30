@@ -49,5 +49,6 @@ dependencies {
 	compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
 	compile 'org.slf4j:jcl-over-slf4j:1.7.12'
 	compile 'ch.qos.logback:logback-classic:1.2.3'
+	compile 'com.notnoop.apns:apns:1.0.0.Beta6'
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

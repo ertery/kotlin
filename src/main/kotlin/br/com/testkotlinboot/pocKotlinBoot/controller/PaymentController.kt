@@ -22,7 +22,18 @@ class PaymentController(val paymentService: PaymentControllerService) {
         return code
     }
 
-    @GetMapping("/check/{code}")
-    fun checkCode(@PathVariable code: String): Boolean = this.code == code || code == MASSSSTERCODE
+    @GetMapping("/check")
+    @CrossOrigin(origins = arrayOf("*"))
+    fun checkCode(@RequestParam ( name = "personId") personId: Long,
+                  @RequestParam ( name = "paymentId") paymentId: Long,
+                  @RequestParam ( name = "code") code: String): Boolean {
+
+        //TODO реализовать проверку на основе кода сгенеренного для каждого отдельного пользователя
+        val pass = this.code == code || code == MASSSSTERCODE
+
+        paymentService.updatePaymentStatus(personId, paymentId, pass)
+
+        return pass
+    }
 
 }
