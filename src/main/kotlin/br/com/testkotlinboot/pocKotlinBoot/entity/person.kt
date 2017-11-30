@@ -28,7 +28,7 @@ data class Person(
 
         var email: String = "",
 
-        @OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
+        @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
         var payments: MutableList<Payment> = mutableListOf(),
 
         @OneToMany(mappedBy = "person", cascade = arrayOf(CascadeType.ALL))

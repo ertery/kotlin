@@ -3,6 +3,7 @@ package br.com.testkotlinboot.pocKotlinBoot.entity
 import br.com.testkotlinboot.pocKotlinBoot.dto.PaymentList
 import br.com.testkotlinboot.pocKotlinBoot.dto.PersonList
 import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
+import br.com.testkotlinboot.pocKotlinBoot.enums.PaymentState
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.Cascade
 import java.time.LocalDateTime
@@ -47,7 +48,7 @@ data class Purpose(
         @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
         var persons: MutableList<PurposePerson> = mutableListOf(),
 
-        @OneToMany(mappedBy = "purpose")
+        @OneToMany(mappedBy = "purpose", fetch = FetchType.LAZY)
         var payments: MutableList<Payment> = mutableListOf()
 ) {
 
@@ -63,7 +64,7 @@ data class Purpose(
                 PersonList(id = pp.person.personId,
                         name = pp.person.name,
                         imagePath = pp.person.imagePath,
-                        payments = pp.person.payments.map { payment ->
+                        payments = pp.person.payments.filter { payment -> PaymentState.DONE == payment.state }.map { payment ->
                             PaymentList(id = payment.id,
                                     ammount = payment.amount,
                                     paymentDate = payment.paymentDate,
