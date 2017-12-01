@@ -31,7 +31,7 @@ class PersonControllerService(val personRepository: PersonRepository,val purpose
         val person: Person = personRepository.findOne(id)
         val purposes: MutableList<PurposeRecord> = mutableListOf()
         person.purposes.forEach { (purpose) ->
-            val record: PurposeRecord = purpose.toDTO()
+            val record: PurposeRecord = purpose.toDTO(true)
             record.isInitial = id == purpose.initiatorId
             purposes.add(record)
         }
