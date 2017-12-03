@@ -13,9 +13,10 @@ class CardUtilClass {
             return sb.toString()
         }
 
-        fun maskNumber(unmasked: String): String {
+        fun maskNumber(unmasked: String?): String {
             val re = Regex("\\D")
-            var r = re.replace(unmasked, "")
+            if (unmasked == null) return "Платеж не может быть исполнен."
+            val r = re.replace(unmasked, "")
             return if (r.length == 16){
                 "**** **** **** " + r.substring(12)
             } else r

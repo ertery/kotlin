@@ -38,6 +38,6 @@ data class Person(
         var facebookId: String = " "
 ) {
     @OneToOne(mappedBy = "person", cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY)
-    var paymentCard: PaymentCard = PaymentCard()
+    var paymentCard: PaymentCard? = null
 }
 

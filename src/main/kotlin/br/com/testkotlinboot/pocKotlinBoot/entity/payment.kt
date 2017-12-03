@@ -46,7 +46,7 @@ data class Payment(
     fun toPaymentResponseDTO() = PaymentResponseDTO (
             amount = this.amount,
             paymentDate = this.paymentDate,
-            cardNumber = CardUtilClass.maskNumber(this.person.paymentCard.cardNumber),
+            cardNumber = CardUtilClass.maskNumber(this.person.paymentCard?.cardNumber),
             purposeDescription = this.purpose.description,
             personName = this.person.name,
             personId = this.person.personId

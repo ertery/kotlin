@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter
 
 
 @Service
-class PersonControllerService(val personRepository: PersonRepository,val purposeRepository: PurposeRepository) {
+class PersonControllerService(val personRepository: PersonRepository, val purposeRepository: PurposeRepository) {
 
 
     private val LOGGER = LoggerFactory.getLogger(PersonControllerService::class.java)
@@ -43,7 +43,7 @@ class PersonControllerService(val personRepository: PersonRepository,val purpose
     fun findPersonByFacebookId(facebookId: String): Any {
         LOGGER.info("Get purposes by facebookId: $facebookId")
         val person = personRepository.findByFacebookId(facebookId)
-        return PersonDTO(name = person?.name!!,  phoneNumber = person.phoneNumber, imagePath = person.imagePath,
+        return PersonDTO(name = person?.name!!, phoneNumber = person.phoneNumber, imagePath = person.imagePath,
                 email = person.email, facebookId = person.facebookId, id = person.personId)
     }
 
@@ -73,24 +73,20 @@ class PersonControllerService(val personRepository: PersonRepository,val purpose
         val person = personRepository.findOne(personId) ?: return -1
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-dd-MM")
-        val paymentCard = person.paymentCard
-        if (paymentCard == null) {
-            val newCard = PaymentCard(validity = LocalDate.parse(card.term, formatter), cardNumber = card.number,
-                    cardholderName = card.cardholderName)
-            person.paymentCard = newCard
-            newCard.person = person
-        } else {
-            paymentCard.cardNumber = card.number
-            paymentCard.cardholderName = card.cardholderName
-            paymentCard.validity = LocalDate.parse(card.term, formatter)
-        }
+
+        if (person.paymentCard != null) return -1
+
+        val newCard = PaymentCard(validity = LocalDate.parse(card.term, formatter), cardNumber = card.number,
+                cardholderName = card.cardholderName)
+        person.paymentCard = newCard
+        newCard.person = person
 
         return personRepository.save(person).paymentCard?.id
     }
 
     @Transactional
     fun addState(state: StatusUpdate): Any {
-        val person  = personRepository.findOne(state.personId)
+        val person = personRepository.findOne(state.personId)
         val purpose = purposeRepository.findOne(state.purposeId)
 
         if (person == null || purpose == null) return -1
@@ -107,5 +103,18 @@ class PersonControllerService(val personRepository: PersonRepository,val purpose
         return 0
     }
 
+    fun updateCard(id: Long, card: CardDTO): Long? {
+        val person = personRepository.findOne(id) ?: return -1
 
+        val formatter = DateTimeFormatter.ofPattern("yyyy-dd-MM")
+        val paymentCard = person.paymentCard
+
+        if (paymentCard != null) {
+            paymentCard.cardNumber = card.number
+            paymentCard.cardholderName = card.cardholderName
+            paymentCard.validity = LocalDate.parse(card.term, formatter)
+        } else return -1
+
+        return personRepository.save(person).paymentCard?.id
+    }
 }

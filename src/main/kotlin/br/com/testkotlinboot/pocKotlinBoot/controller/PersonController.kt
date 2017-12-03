@@ -32,6 +32,8 @@ class PersonController(val personService: PersonControllerService) {
     fun saveCardForPerson(@PathVariable id: Long,
                           @RequestBody card: CardDTO): Long? = personService.addCard(id, card)
 
-
+    @PutMapping("/{id}/card")
+    fun updateCardForPerson(@PathVariable id: Long,
+                            @RequestBody card: CardDTO): Long? = personService.updateCard(id, card)
 
 }
