@@ -26,18 +26,18 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
     fun getPurposes(): Any {
         val findAll = purposeRepository.findAll()
         val records: MutableList<PurposeRecord> = mutableListOf()
-        findAll.forEach { purpose -> records.add(purpose.toDTO()) }
+        findAll.forEach { purpose -> records.add(purpose.toDTO(false)) }
         return records
     }
 
     fun getPurposeById(id: Long): Any {
         val findOne = purposeRepository.findOne(id)
-        return findOne.toDTO()
+        return findOne.toDTO(true)
     }
 
     fun findPurposeByName(name: String): Any {
         val findByName = purposeRepository.findByName(name)
-        return findByName?.toDTO()
+        return findByName.toDTO(true)
     }
 
     @Transactional
