@@ -75,4 +75,7 @@ data class Purpose(
                         phoneNumber = pp.person.phoneNumber)
             } as MutableList<PersonList>
     )
+
+    override fun toString(): String =
+            "Purpose(purposeId=$purposeId, name='$name', creationDate=$creationDate, finishDate=$finishDate, targetAmmount=$targetAmmount, currentAmmount=$currentAmmount, initiatorId=$initiatorId, imageUrl='$imageUrl', description='$description')"
 }

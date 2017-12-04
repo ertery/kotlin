@@ -22,4 +22,8 @@ data class PurposePerson(
     @Column(name = "purpose_state")
     var purposeState: PersonPurposeState = PersonPurposeState.INVITESEND
 
+    override fun toString(): String =
+            "PurposePerson(purpose=${purpose.purposeId}, person=${person.personId}, purposeState=$purposeState)"
+
+
 }

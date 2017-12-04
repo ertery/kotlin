@@ -94,34 +94,28 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
     fun addPersonsToPurpose(purposeId: Long, addedPersons: MutableList<UnregisteredPerson>): Long {
 
         val purpose = purposeRepository.findOne(purposeId)
+
         if (purpose == null) {
             LOGGER.error("There are no purpose with id $purposeId")
-            return -1
-        }
-        val updateList = purpose.persons.filter { (purpose1) ->
-            purpose1.purposeId == purposeId
-        }
-
-        if (updateList.size > 1) {
-            LOGGER.error("There are multiple purposes with id $purposeId")
             return -1
         }
 
         val forSave: MutableList<Person> = mutableListOf()
 
+
         addedPersons.forEach {
             val person = personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber))
             if (person != null) {
                 val pp = PurposePerson(purpose, person)
+                if (purpose.persons.contains(pp)){
+                    return  -1
+                }
                 person.purposes.add(pp)
                 LOGGER.info("Person with id ${person.personId} was successfully join to purpose ${purpose.name}")
             } else {
                 val personSave = Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
                 if (!forSave.any { p -> p.phoneNumber == personSave.phoneNumber }) {
                     val pp = PurposePerson(purpose, personSave)
-                    val paymentCard = PaymentCard()
-                    paymentCard.person = personSave
-                    personSave.paymentCard = paymentCard
                     personSave.purposes.add(pp)
                     forSave.add(personSave)
                     LOGGER.info("Person with phone number ${PhoneUtilClass.format(it.phoneNumber)} was successfully join to purpose ${purpose.name}")

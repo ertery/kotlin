@@ -51,4 +51,9 @@ data class Payment(
             personName = this.person.name,
             personId = this.person.personId
     )
+
+    override fun toString(): String {
+        return "Payment(id=$id, amount=$amount, paymentDate=$paymentDate, state=$state, paymentMethod=$paymentMethod, channel=$channel)"
+    }
+
 }

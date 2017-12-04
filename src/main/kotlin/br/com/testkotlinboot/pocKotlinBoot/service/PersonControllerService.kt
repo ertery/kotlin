@@ -43,8 +43,13 @@ class PersonControllerService(val personRepository: PersonRepository, val purpos
     fun findPersonByFacebookId(facebookId: String): Any {
         LOGGER.info("Get purposes by facebookId: $facebookId")
         val person = personRepository.findByFacebookId(facebookId)
-        return PersonDTO(name = person?.name!!, phoneNumber = person.phoneNumber, imagePath = person.imagePath,
+        val response = PersonDTO(name = person?.name!!, phoneNumber = person.phoneNumber, imagePath = person.imagePath,
                 email = person.email, facebookId = person.facebookId, id = person.personId)
+        if (person.paymentCard != null) {
+            response.paymentCard = CardDTO(number = person.paymentCard!!.cardNumber, cardholderName = person.paymentCard!!.cardholderName,
+                    term = person.paymentCard!!.validity?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+        }
+        return response
     }
 
     @Transactional
