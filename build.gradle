@@ -51,4 +51,5 @@ dependencies {
 	compile 'ch.qos.logback:logback-classic:1.2.3'
 	compile 'com.notnoop.apns:apns:1.0.0.Beta6'
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('com.h2database:h2:1.4.196')
 }

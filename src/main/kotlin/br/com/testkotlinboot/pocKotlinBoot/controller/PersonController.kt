@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*
 class PersonController(val personService: PersonControllerService) {
 
     @GetMapping("/{id}")
-    fun getPurposeById(@PathVariable id: Long) = personService.findByPersonId(id)
+    fun getPurposeByPersonId(@PathVariable id: Long) = personService.findByPersonId(id)
 
     @GetMapping("/facebook/{id}")
-    fun getPurposeByFacebookId(@PathVariable id: String) = personService.findPersonByFacebookId(id)
+    fun getPersonByFacebookId(@PathVariable id: String) = personService.findPersonByFacebookId(id)
 
     @PutMapping("/state")
     fun updateState(@RequestBody status: StatusUpdate) = personService.updateState(status)
@@ -24,9 +24,7 @@ class PersonController(val personService: PersonControllerService) {
     fun addState(@RequestBody state: StatusUpdate) = personService.addState(state)
 
     @PostMapping("")
-    fun savePerson(@RequestBody createPerson: PersonDTO): Long {
-          return personService.createPerson(createPerson)
-    }
+    fun savePerson(@RequestBody createPerson: PersonDTO): Long = personService.createPerson(createPerson)
 
     @PostMapping("/{id}/card")
     fun saveCardForPerson(@PathVariable id: Long,

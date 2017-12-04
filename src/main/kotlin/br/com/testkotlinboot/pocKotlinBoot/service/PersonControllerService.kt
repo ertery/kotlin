@@ -35,15 +35,15 @@ class PersonControllerService(val personRepository: PersonRepository, val purpos
             record.isInitial = id == purpose.initiatorId
             purposes.add(record)
         }
-        LOGGER.info("SUCCESSFUL: Purposes were returned : {}", purposes)
         return purposes
     }
 
     @Transactional
     fun findPersonByFacebookId(facebookId: String): Any {
         LOGGER.info("Get purposes by facebookId: $facebookId")
-        val person = personRepository.findByFacebookId(facebookId)
-        val response = PersonDTO(name = person?.name!!, phoneNumber = person.phoneNumber, imagePath = person.imagePath,
+        val person = personRepository.findByFacebookId(facebookId) ?: return -1
+
+        val response = PersonDTO(name = person.name, phoneNumber = person.phoneNumber, imagePath = person.imagePath,
                 email = person.email, facebookId = person.facebookId, id = person.personId)
         if (person.paymentCard != null) {
             response.paymentCard = CardDTO(number = person.paymentCard!!.cardNumber, cardholderName = person.paymentCard!!.cardholderName,
