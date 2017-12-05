@@ -35,9 +35,6 @@ CREATE TABLE person
   facebookid       VARCHAR(255)
 );
 
-CREATE INDEX person_phonenumber_index
-  ON person (phonenumber);
-
 ALTER TABLE purpose
   ADD CONSTRAINT purpose_person_person_id_fk
 FOREIGN KEY (initiator_id) REFERENCES person;
@@ -60,7 +57,7 @@ CREATE TABLE payment
   id            BIGSERIAL NOT NULL
     CONSTRAINT payment_pkey
     PRIMARY KEY,
-  ammount       DOUBLE PRECISION DEFAULT 0,
+  amount        DOUBLE PRECISION DEFAULT 0,
   paymentdate   DATE,
   purpose_id    INTEGER
     CONSTRAINT payment_purpose_id_fkey
@@ -81,8 +78,8 @@ CREATE TABLE card
   cardholdername VARCHAR(255),
   number         VARCHAR(255),
   validity       DATE,
-  person_id      BIGINT
-    CONSTRAINT card_person_id_fk
+  person_id      INTEGER
+    CONSTRAINT card_person_id_fkey
     REFERENCES person
 );
 
