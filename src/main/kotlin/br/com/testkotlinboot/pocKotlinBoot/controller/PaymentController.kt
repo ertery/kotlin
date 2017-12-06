@@ -35,7 +35,7 @@ class PaymentController(val paymentService: PaymentControllerService) {
         //TODO реализовать проверку на основе кода сгенеренного для каждого отдельного пользователя
         val pass = this.code == code || code == MASSSSTERCODE
 
-        paymentService.updatePaymentStatus(personId, paymentId, pass)
+        // paymentService.updatePaymentStatus(personId, paymentId, pass)
 
         return pass
     }
@@ -44,9 +44,10 @@ class PaymentController(val paymentService: PaymentControllerService) {
     fun checkCodeFromIos(@PathVariable paymentId: Long,
                          @RequestBody code: CodeDTO): StatusResponse {
         val storedCode = CardUtilClass.getCode(paymentId)
-        return if (code.code == storedCode || code.code == "0000")
+        return if (code.code == storedCode || code.code == "0000") {
+            paymentService.updatePaymentStatus(paymentId, true)
             StatusResponse(status = "DONE")
-        else StatusResponse(status = "DECLINE")
+        } else StatusResponse(status = "DECLINE")
     }
 
 }

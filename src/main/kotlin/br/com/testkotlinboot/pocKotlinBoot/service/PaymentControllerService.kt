@@ -56,7 +56,7 @@ class PaymentControllerService(val paymentRepository: PaymentRepository, val per
         service.push(token, payload)
     }
 
-    fun updatePaymentStatus(personId: Long, paymentId: Long, isSuccess: Boolean) {
+    fun updatePaymentStatus(paymentId: Long, isSuccess: Boolean) {
         val processedPayment = paymentRepository.findOne(paymentId)
 
         if (processedPayment != null && PaymentState.NEW != processedPayment.state){
