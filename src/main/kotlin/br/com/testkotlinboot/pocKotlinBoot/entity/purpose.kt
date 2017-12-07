@@ -43,9 +43,7 @@ data class Purpose(
         var description: String = "",
 
         @JsonIgnore
-        @OneToMany(mappedBy = "purpose", fetch = FetchType.EAGER,
-                cascade = arrayOf(CascadeType.MERGE, CascadeType.PERSIST))
-        @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+        @OneToMany(mappedBy = "purpose", cascade = arrayOf(CascadeType.ALL))
         var persons: MutableList<PurposePerson> = mutableListOf(),
 
         @OneToMany(mappedBy = "purpose", fetch = FetchType.LAZY)

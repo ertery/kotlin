@@ -5,19 +5,25 @@ import br.com.testkotlinboot.pocKotlinBoot.dto.CardDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.PersonDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
 import br.com.testkotlinboot.pocKotlinBoot.entity.Person
+import br.com.testkotlinboot.pocKotlinBoot.entity.Purpose
+import br.com.testkotlinboot.pocKotlinBoot.entity.PurposePerson
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import br.com.testkotlinboot.pocKotlinBoot.service.PersonControllerService
+import org.hibernate.Hibernate
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+
 import org.springframework.test.context.junit4.SpringRunner
+import java.time.LocalDateTime
+import javax.transaction.Transactional
 
 
 @SpringBootTest(
@@ -25,7 +31,8 @@ import org.springframework.test.context.junit4.SpringRunner
 )
 @AutoConfigureMockMvc
 @RunWith(SpringRunner::class)
-internal class PersonControllerTest {
+@EntityScan
+internal class PersonControllerServiceTest {
 
 
     @Autowired
@@ -40,18 +47,44 @@ internal class PersonControllerTest {
 
     @Before
     fun setUp() {
-     //   personRepository.saveAndFlush(Person(name = "Test Test", phoneNumber = "8005553535", facebookId = "1", email = "google@goolge.com", registrationDate = LocalDateTime.now()))
 
     }
 
     @Test
+    @Transactional
     fun getPurposeByPersonId() {
+        val savedPurpose = purposeRepository.saveAndFlush(Purpose(
+                name = "Тестовая цель",
+                finishDate = LocalDateTime.of(2018, 10, 23, 17, 15),
+                targetAmmount = 1000.0,
+                imageUrl = "http://testSite.com",
+                description = "Поймай меня, если сможешь"
+        ))
+        val savedPerson = personRepository.saveAndFlush(Person(
+                name = "Test Test",
+                phoneNumber = "8005553535",
+                facebookId = "1",
+                email = "google@goolge.com",
+                registrationDate = LocalDateTime.now()
+        ))
+
+
+
+        savedPerson.purposes = mutableListOf(PurposePerson(savedPurpose, savedPerson))
+        val person = personRepository.save(savedPerson)
+        savedPurpose.persons.add(PurposePerson(savedPurpose, person))
+        purposeRepository.saveAndFlush(savedPurpose)
+
+
+        val purposes = service.findByPersonId(50) as MutableList<PurposeRecord>
+        assertEquals(1, purposes.size)
+        assertNotNull(purposes[0].persons)
     }
 
     @Test
     fun getPersonByFacebookId() {
         val person = service.findPersonByFacebookId("1")
-        assertNotNull(person)
+        assertNotEquals(-1, person)
     }
 
     @Test
@@ -93,7 +126,7 @@ internal class PersonControllerTest {
 
     @Test
     fun saveCardForPerson() {
-       val id = service.createPerson(PersonDTO(name = "Created Person",
+        val id = service.createPerson(PersonDTO(name = "Created Person",
                 imagePath = "http://noimage.com",
                 phoneNumber = "33456798",
                 facebookId = "4",
@@ -115,8 +148,8 @@ internal class PersonControllerTest {
     }
 
     @After
-    fun destroy(){
-        personRepository.deleteAll()
+    fun destroy() {
+
     }
 
 
