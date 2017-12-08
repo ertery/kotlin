@@ -60,7 +60,7 @@ CREATE TABLE payment
   id            BIGSERIAL NOT NULL
     CONSTRAINT payment_pkey
     PRIMARY KEY,
-  ammount       DOUBLE PRECISION DEFAULT 0,
+  amount        DOUBLE PRECISION DEFAULT 0,
   paymentdate   DATE,
   purpose_id    INTEGER
     CONSTRAINT payment_purpose_id_fkey
@@ -85,5 +85,22 @@ CREATE TABLE card
     CONSTRAINT card_person_id_fk
     REFERENCES person
 );
+
+CREATE TABLE device_info
+(
+  id        BIGSERIAL NOT NULL
+    CONSTRAINT device_info_pkey
+    PRIMARY KEY,
+  token     VARCHAR(255),
+  person_id BIGINT    NOT NULL
+    CONSTRAINT device_info_person_person_id_fk
+    REFERENCES person
+);
+
+CREATE UNIQUE INDEX device_info_id_uindex
+  ON device_info (id);
+
+CREATE UNIQUE INDEX device_info_token_uindex
+  ON device_info (token);
 
 */
