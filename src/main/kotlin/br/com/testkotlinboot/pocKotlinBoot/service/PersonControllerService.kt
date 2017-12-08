@@ -1,13 +1,12 @@
 package br.com.testkotlinboot.pocKotlinBoot.service
 
-import br.com.testkotlinboot.pocKotlinBoot.dto.CardDTO
-import br.com.testkotlinboot.pocKotlinBoot.dto.PersonDTO
-import br.com.testkotlinboot.pocKotlinBoot.dto.PurposeRecord
-import br.com.testkotlinboot.pocKotlinBoot.dto.StatusUpdate
+import br.com.testkotlinboot.pocKotlinBoot.dto.*
+import br.com.testkotlinboot.pocKotlinBoot.entity.Device
 import br.com.testkotlinboot.pocKotlinBoot.entity.PaymentCard
 import br.com.testkotlinboot.pocKotlinBoot.entity.Person
 import br.com.testkotlinboot.pocKotlinBoot.entity.PurposePerson
 import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
+import br.com.testkotlinboot.pocKotlinBoot.repository.DeviceInfoRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import br.com.testkotlinboot.pocKotlinBoot.utils.PhoneUtilClass
@@ -19,7 +18,11 @@ import java.time.format.DateTimeFormatter
 
 
 @Service
-class PersonControllerService(val personRepository: PersonRepository, val purposeRepository: PurposeRepository) {
+class PersonControllerService(
+        val personRepository: PersonRepository,
+        val purposeRepository: PurposeRepository,
+        val deviceInfoRepository: DeviceInfoRepository
+) {
 
 
     private val LOGGER = LoggerFactory.getLogger(PersonControllerService::class.java)
@@ -43,6 +46,8 @@ class PersonControllerService(val personRepository: PersonRepository, val purpos
     fun findPersonByFacebookId(facebookId: String): Any {
         LOGGER.info("Get purposes by facebookId: $facebookId")
         val person = personRepository.findByFacebookId(facebookId)
+        val device = person?.devices
+        println(device!![0].token)
         val response = PersonDTO(name = person?.name!!, phoneNumber = person.phoneNumber, imagePath = person.imagePath,
                 email = person.email, facebookId = person.facebookId, id = person.personId)
         if (person.paymentCard != null) {
@@ -121,5 +126,19 @@ class PersonControllerService(val personRepository: PersonRepository, val purpos
         } else return -1
 
         return personRepository.save(person).paymentCard?.id
+    }
+
+    fun addToken(token: TokenDTO) {
+        val person = personRepository.findByFacebookId(token.facebookId)
+
+        val device = Device(id = null, token = token.token)
+
+        if (person != null) {
+            device.person = person
+            val savedDevice = deviceInfoRepository.saveAndFlush(device)
+            person.devices.add(savedDevice)
+        }
+
+        personRepository.saveAndFlush(person)
     }
 }

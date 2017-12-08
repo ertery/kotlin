@@ -6,6 +6,7 @@ import br.com.testkotlinboot.pocKotlinBoot.entity.*
 import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
+import br.com.testkotlinboot.pocKotlinBoot.utils.CardUtilClass
 import br.com.testkotlinboot.pocKotlinBoot.utils.PhoneUtilClass
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -19,6 +20,8 @@ import javax.annotation.Resource
 class PurposeControllerService(val purposeRepository: PurposeRepository, val personRepository: PersonRepository) {
 
     val LOGGER = LoggerFactory.getLogger(PurposeControllerService::class.java.name)
+
+    val  PUSH_TITLE_INVITE = "Новое приглашение"
 
     @Resource(name = "proxy")
     lateinit var selfRef: PurposeControllerService
@@ -111,6 +114,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
                     return  -1
                 }
                 person.purposes.add(pp)
+                CardUtilClass.sendPush(person.devices[0].token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${purpose.name}")
                 LOGGER.info("Person with id ${person.personId} was successfully join to purpose ${purpose.name}")
             } else {
                 val personSave = Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber))

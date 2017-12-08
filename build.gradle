@@ -50,5 +50,6 @@ dependencies {
 	compile 'org.slf4j:jcl-over-slf4j:1.7.12'
 	compile 'ch.qos.logback:logback-classic:1.2.3'
 	compile 'com.notnoop.apns:apns:1.0.0.Beta6'
+	compile 'com.h2database:h2:1.4.196'
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

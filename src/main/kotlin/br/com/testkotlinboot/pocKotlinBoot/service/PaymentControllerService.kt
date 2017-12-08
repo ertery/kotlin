@@ -1,6 +1,7 @@
 package br.com.testkotlinboot.pocKotlinBoot.service
 
 import br.com.testkotlinboot.pocKotlinBoot.dto.PaymentDTO
+import br.com.testkotlinboot.pocKotlinBoot.entity.Device
 import br.com.testkotlinboot.pocKotlinBoot.entity.Payment
 import br.com.testkotlinboot.pocKotlinBoot.enums.Channel
 import br.com.testkotlinboot.pocKotlinBoot.enums.PaymentMethod
@@ -8,7 +9,7 @@ import br.com.testkotlinboot.pocKotlinBoot.enums.PaymentState
 import br.com.testkotlinboot.pocKotlinBoot.repository.PaymentRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
-import com.notnoop.apns.APNS
+import br.com.testkotlinboot.pocKotlinBoot.utils.CardUtilClass
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -46,20 +47,19 @@ class PaymentControllerService(val paymentRepository: PaymentRepository, val per
         return payment.toPaymentResponseDTO()
     }
 
-    fun sendPushToIos() {
+    fun sendCodeByPush(paymentId: Long) {
 
-        val service = APNS.newService().withCert("cert.p12", "qwerty").withSandboxDestination().build()
-        val payload = APNS.newPayload().alertTitle("Payment Code").alertBody("0000").build()
+        val payment: Payment = paymentRepository.getOne(paymentId)
+        val devices: MutableList<Device> = payment.person.devices
 
-        val token = "b2591weprkl523234noybam14mrh5bnr"
+        devices.forEach { device -> CardUtilClass.sendPush(token = device.token, body = CardUtilClass.getCode(paymentId), title = "Олалала") }
 
-        service.push(token, payload)
     }
 
     fun updatePaymentStatus(paymentId: Long, isSuccess: Boolean) {
         val processedPayment = paymentRepository.findOne(paymentId)
 
-        if (processedPayment != null && PaymentState.NEW != processedPayment.state){
+        if (processedPayment != null && PaymentState.NEW != processedPayment.state) {
             LOGGER.info("Payment with id $paymentId is not in NEW state, proceed without saving or update")
             return
         }

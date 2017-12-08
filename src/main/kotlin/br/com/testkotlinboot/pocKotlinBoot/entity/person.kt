@@ -31,6 +31,9 @@ data class Person(
         @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
         var payments: MutableList<Payment> = mutableListOf(),
 
+        @OneToMany(mappedBy = "person", fetch = FetchType.LAZY, cascade = arrayOf(CascadeType.ALL))
+        var devices: MutableList<Device> = mutableListOf(),
+
         @OneToMany(mappedBy = "person", cascade = arrayOf(CascadeType.ALL))
         var purposes: MutableList<PurposePerson> = mutableListOf(),
 

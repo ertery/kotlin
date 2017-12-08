@@ -8,7 +8,6 @@ import br.com.testkotlinboot.pocKotlinBoot.service.PaymentControllerService
 import br.com.testkotlinboot.pocKotlinBoot.service.PersonControllerService
 import br.com.testkotlinboot.pocKotlinBoot.service.PurposeControllerService
 import br.com.testkotlinboot.pocKotlinBoot.utils.CardUtilClass
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.*
 
 

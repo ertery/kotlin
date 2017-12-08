@@ -3,6 +3,7 @@ package br.com.testkotlinboot.pocKotlinBoot.controller
 import br.com.testkotlinboot.pocKotlinBoot.dto.CardDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.PersonDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.StatusUpdate
+import br.com.testkotlinboot.pocKotlinBoot.dto.TokenDTO
 import br.com.testkotlinboot.pocKotlinBoot.service.PersonControllerService
 import org.springframework.web.bind.annotation.*
 
@@ -33,5 +34,10 @@ class PersonController(val personService: PersonControllerService) {
     @PutMapping("/{id}/card")
     fun updateCardForPerson(@PathVariable id: Long,
                             @RequestBody card: CardDTO): Long? = personService.updateCard(id, card)
+
+    @PutMapping("/token")
+    fun addTokenForPerson(@RequestBody token: TokenDTO){
+        personService.addToken(token)
+    }
 
 }
