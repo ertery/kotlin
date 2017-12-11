@@ -52,4 +52,5 @@ dependencies {
 	compile 'com.notnoop.apns:apns:1.0.0.Beta6'
 	compile 'com.h2database:h2:1.4.196'
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile 'com.h2database:h2:1.4.196'
 }
