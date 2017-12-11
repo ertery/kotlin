@@ -1,5 +1,6 @@
 package br.com.testkotlinboot.pocKotlinBoot.utils
 
+
 import com.notnoop.apns.APNS
 import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Value
@@ -7,12 +8,11 @@ import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
 
-class CardUtilClass {
+open class CardUtilClass(  @Value("\${password}") var password: String) {
+
+
 
     companion object {
-
-        @Value("\${password}")
-        private val password: String? = null
 
         private val codes: HashMap<Long, String> = hashMapOf()
 

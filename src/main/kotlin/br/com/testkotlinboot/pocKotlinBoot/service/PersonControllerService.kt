@@ -46,8 +46,6 @@ class PersonControllerService(
     fun findPersonByFacebookId(facebookId: String): Any {
         LOGGER.info("Get purposes by facebookId: $facebookId")
         val person = personRepository.findByFacebookId(facebookId)
-        val device = person?.devices
-        println(device!![0].token)
         val response = PersonDTO(name = person?.name!!, phoneNumber = person.phoneNumber, imagePath = person.imagePath,
                 email = person.email, facebookId = person.facebookId, id = person.personId)
         if (person.paymentCard != null) {

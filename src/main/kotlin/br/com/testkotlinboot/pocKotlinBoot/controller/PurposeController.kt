@@ -27,18 +27,18 @@ class PurposeController(val purposeService: PurposeControllerService,
     @GetMapping("/find")
     fun getPurposeByName(@RequestParam(value = "byName", required = false) name: String?,
                          @RequestParam(value = "byId", required = false) id: Long?): Any = when {
-                             name != null -> purposeService.findPurposeByName(name)
-                             id != null -> personService.findByPersonId(id)
-                             else -> mutableListOf<String>()
-                         }
+        name != null -> purposeService.findPurposeByName(name)
+        id != null -> personService.findByPersonId(id)
+        else -> mutableListOf<String>()
+    }
 
     @PostMapping("/")
     fun addPurpose(@RequestBody newPurpose: CreatePurpose): Any = purposeService.addPurpose(newPurpose)
 
     @PostMapping("/{id}/person")
     fun addPersonsToPurpose(@PathVariable id: Long,
-                            @RequestBody addedPersons: MutableList<UnregisteredPerson>){
-            purposeService.addPersonsToPurpose(id, addedPersons)
+                            @RequestBody addedPersons: MutableList<UnregisteredPerson>) {
+        purposeService.addPersonsToPurpose(id, addedPersons)
     }
 
     @PostMapping("{purposeId}/person/{personId}/payment")
@@ -46,8 +46,11 @@ class PurposeController(val purposeService: PurposeControllerService,
                        @PathVariable personId: Long,
                        @RequestBody newPayment: PaymentDTO): CodeDTO {
         val paymentId = paymentService.createNewPayment(purposeId, personId, newPayment)?.id
-        val code =  CardUtilClass.generateCode()
-        if (paymentId != null) CardUtilClass.storeCode(paymentId, code)
+        val code = CardUtilClass.generateCode()
+        if (paymentId != null) {
+            CardUtilClass.storeCode(paymentId, code)
+            paymentService.sendCodeByPush(paymentId)
+        }
         return CodeDTO(paymentId, code)
     }
 }

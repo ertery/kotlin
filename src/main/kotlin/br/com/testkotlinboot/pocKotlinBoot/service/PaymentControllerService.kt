@@ -52,7 +52,7 @@ class PaymentControllerService(val paymentRepository: PaymentRepository, val per
         val payment: Payment = paymentRepository.getOne(paymentId)
         val devices: MutableList<Device> = payment.person.devices
 
-        devices.forEach { device -> CardUtilClass.sendPush(token = device.token, body = CardUtilClass.getCode(paymentId), title = "Олалала") }
+        devices.forEach { device -> CardUtilClass.sendPush(token = device.token, body = CardUtilClass.getCode(paymentId), title = "Payment code") }
 
     }
 

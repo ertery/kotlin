@@ -12,9 +12,9 @@ data class Device(
         val id: Long? = -1,
 
         @Column
-        val token: String
+        val token: String = ""
 ) {
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "person_id")
     lateinit var person: Person
 }
