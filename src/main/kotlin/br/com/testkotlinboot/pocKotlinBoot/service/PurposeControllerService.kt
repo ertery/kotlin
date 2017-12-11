@@ -21,7 +21,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
 
     val LOGGER = LoggerFactory.getLogger(PurposeControllerService::class.java.name)
 
-    val  PUSH_TITLE_INVITE = "Новое приглашение"
+    val PUSH_TITLE_INVITE = "Новое приглашение"
 
     @Resource(name = "proxy")
     lateinit var selfRef: PurposeControllerService
@@ -112,7 +112,11 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
                 val pp = PurposePerson(purpose, person)
                 if (!purpose.persons.contains(pp)) {
                     person.purposes.add(pp)
-                    CardUtilClass.sendPush(person.devices[0].token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${purpose.name}")
+                    if (person.devices.size > 0) {
+                        person.devices.forEach { device ->
+                            CardUtilClass.sendPush(device.token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${purpose.name}")
+                        }
+                    }
                     LOGGER.info("Person with id ${person.personId} was successfully join to purpose ${purpose.name}")
                 }
             } else {
