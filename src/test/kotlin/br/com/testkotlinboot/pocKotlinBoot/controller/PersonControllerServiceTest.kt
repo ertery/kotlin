@@ -60,21 +60,18 @@ internal class PersonControllerServiceTest {
                 imageUrl = "http://testSite.com",
                 description = "Поймай меня, если сможешь"
         ))
-        val savedPerson = personRepository.saveAndFlush(Person(
+        val person = Person(
                 name = "Test Test",
                 phoneNumber = "8005553535",
                 facebookId = "1",
                 email = "google@goolge.com",
                 registrationDate = LocalDateTime.now()
-        ))
+        )
 
+        val pp = PurposePerson(savedPurpose, person)
+        person.purposes.add(pp)
 
-
-        savedPerson.purposes = mutableListOf(PurposePerson(savedPurpose, savedPerson))
-        val person = personRepository.save(savedPerson)
-        savedPurpose.persons.add(PurposePerson(savedPurpose, person))
-        purposeRepository.saveAndFlush(savedPurpose)
-
+        personRepository.saveAndFlush(person)
 
         val purposes = service.findByPersonId(50) as MutableList<PurposeRecord>
         assertEquals(1, purposes.size)
