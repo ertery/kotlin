@@ -110,12 +110,11 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
             val person = personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber))
             if (person != null) {
                 val pp = PurposePerson(purpose, person)
-                if (purpose.persons.contains(pp)){
-                    return  -1
+                if (!purpose.persons.contains(pp)) {
+                    person.purposes.add(pp)
+                    CardUtilClass.sendPush(person.devices[0].token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${purpose.name}")
+                    LOGGER.info("Person with id ${person.personId} was successfully join to purpose ${purpose.name}")
                 }
-                person.purposes.add(pp)
-                CardUtilClass.sendPush(person.devices[0].token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${purpose.name}")
-                LOGGER.info("Person with id ${person.personId} was successfully join to purpose ${purpose.name}")
             } else {
                 val personSave = Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
                 if (!forSave.any { p -> p.phoneNumber == personSave.phoneNumber }) {
