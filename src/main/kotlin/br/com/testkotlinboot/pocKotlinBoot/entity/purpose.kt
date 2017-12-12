@@ -58,6 +58,7 @@ data class Purpose(
             imageUrl = this.imageUrl,
             description = this.description,
             isInitial = false,
+            finishDate = finishDate?.toLocalDate(),
             persons = persons.map { pp ->
                 PersonList(id = pp.person.personId,
                         name = pp.person.name,

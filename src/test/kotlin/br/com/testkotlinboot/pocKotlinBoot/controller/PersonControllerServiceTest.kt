@@ -123,6 +123,7 @@ internal class PersonControllerServiceTest {
 
     @Test
     fun addState() {
+
     }
 
     @Test
@@ -179,7 +180,6 @@ internal class PersonControllerServiceTest {
 
     @After
     fun destroy() {
-        personRepository.deleteAll()
     }
 
 

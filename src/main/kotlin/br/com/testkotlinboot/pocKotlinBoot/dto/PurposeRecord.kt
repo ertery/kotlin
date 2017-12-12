@@ -1,9 +1,9 @@
 package br.com.testkotlinboot.pocKotlinBoot.dto
 
-import br.com.testkotlinboot.pocKotlinBoot.entity.Payment
+import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 class PurposeRecord(
         val id: Long,
@@ -12,6 +12,8 @@ class PurposeRecord(
         val currentAmmount: Double = 0.0,
         val imageUrl: String = "",
         val description: String = "",
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-dd-MM")
+        val finishDate: LocalDate?,
         @get:JsonProperty("isInitial")
         var isInitial: Boolean? = false,
         @JsonIgnore

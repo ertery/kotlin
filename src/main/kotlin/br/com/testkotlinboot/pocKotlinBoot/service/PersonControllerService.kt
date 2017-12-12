@@ -50,7 +50,7 @@ class PersonControllerService(
                 email = person.email, facebookId = person.facebookId, id = person.personId)
         if (person.paymentCard != null) {
             response.paymentCard = CardDTO(number = person.paymentCard!!.cardNumber, cardholderName = person.paymentCard!!.cardholderName,
-                    term = person.paymentCard!!.validity?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), id = person.paymentCard!!.id)
+                    term = person.paymentCard!!.validity?.format(DateTimeFormatter.ofPattern("yyyy-dd-MM")), id = person.paymentCard!!.id)
         }
         return response
     }
