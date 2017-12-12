@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 import javax.annotation.Resource
 
 
@@ -47,7 +50,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
     fun addPurpose(purpose: CreatePurpose): Any {
         val createPurpose = Purpose(name = purpose.name,
                 targetAmmount = purpose.targetAmmount,
-                finishDate = purpose.finishDate,
+                finishDate = LocalDateTime.of(purpose.finishDate, LocalTime.now(ZoneId.of("Europe/Moscow"))),
                 imageUrl = purpose.imageUrl,
                 description = purpose.description,
                 initiatorId = purpose.initiatorId)
