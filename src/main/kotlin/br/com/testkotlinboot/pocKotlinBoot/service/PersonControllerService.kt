@@ -131,7 +131,7 @@ class PersonControllerService(
 
         val device = Device(id = null, token = token.token)
 
-        if (person != null) {
+        if (person != null && !person.devices.any { it.token == token.token }) {
             device.person = person
             val savedDevice = deviceInfoRepository.saveAndFlush(device)
             person.devices.add(savedDevice)
