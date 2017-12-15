@@ -126,6 +126,7 @@ class PersonControllerService(
         return personRepository.save(person).paymentCard?.id
     }
 
+    @Transactional
     fun addToken(token: TokenDTO) {
         val person = personRepository.findByFacebookId(token.facebookId)
 

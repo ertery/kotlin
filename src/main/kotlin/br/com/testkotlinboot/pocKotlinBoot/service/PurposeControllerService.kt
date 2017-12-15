@@ -9,6 +9,8 @@ import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import br.com.testkotlinboot.pocKotlinBoot.utils.CardUtilClass
 import br.com.testkotlinboot.pocKotlinBoot.utils.PhoneUtilClass
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Example
+import org.springframework.data.domain.ExampleMatcher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -115,12 +117,15 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
                 val pp = PurposePerson(purpose, person)
                 if (!purpose.persons.contains(pp)) {
                     person.purposes.add(pp)
+                    purposeRepository.saveAndFlush(purpose)
+                    personRepository.saveAndFlush(person)
                     if (person.devices.size > 0) {
                         person.devices.forEach { device ->
                             CardUtilClass.sendPush(device.token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${purpose.name}")
+
                         }
                     }
-                    LOGGER.info("Person with id ${person.personId} was successfully join to purpose ${purpose.name}")
+                    LOGGER.info("Person with id ${person.personId} was successfully invited for purpose ${purpose.name}")
                 }
             } else {
                 val personSave = Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
@@ -140,7 +145,5 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun savePurpose(purpose: Purpose): Purpose? {
-        return purposeRepository.saveAndFlush(purpose)
-    }
+    fun savePurpose(purpose: Purpose): Purpose? = purposeRepository.saveAndFlush(purpose)
 }

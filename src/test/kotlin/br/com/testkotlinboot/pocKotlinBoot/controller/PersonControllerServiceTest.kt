@@ -73,7 +73,7 @@ internal class PersonControllerServiceTest {
         val pp = PurposePerson(savedPurpose, person)
         person.purposes.add(pp)
 
-       val id = personRepository.saveAndFlush(person).personId
+        val id = personRepository.saveAndFlush(person).personId
 
         val purposes = service.findByPersonId(id) as MutableList<PurposeRecord>
         assertEquals(1, purposes.size)
