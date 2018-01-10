@@ -64,7 +64,7 @@ class PersonControllerService(
     }
 
     fun createPerson(createPerson: PersonDTO): Long {
-        if (personRepository.findByPhoneNumber(PhoneUtilClass.format(createPerson.phoneNumber)) != null ||
+        if (personRepository.findByPhoneNumber(PhoneUtilClass.format(createPerson.phoneNumber)) != null &&
                 personRepository.findByFacebookId(createPerson.facebookId) != null) {
             LOGGER.error("Person with phone ${createPerson.phoneNumber} and facebookId ${createPerson.facebookId} already exist")
             return -1
