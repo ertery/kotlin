@@ -59,7 +59,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
 
         val forSave: MutableList<Person> = mutableListOf()
 
-        val newPurpose = selfRef.savePurpose(createPurpose)!!
+        val newPurpose = selfRef.savePurpose(createPurpose)
 
         val initPerson = personRepository.findOne(purpose.initiatorId)
 
@@ -73,10 +73,10 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
 
         purpose.persons.forEach {
             val existPerson = personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber))
-            if (existPerson != null) {
+            if (existPerson != null && !forSave.contains(existPerson)) {
+                LOGGER.info("Person with such phone number ${it.phoneNumber} already present in db")
                 val pp = PurposePerson(newPurpose, existPerson)
                 existPerson.purposes.add(pp)
-                LOGGER.info("Person with such phone number ${it.phoneNumber} already present in db")
                 forSave.add(existPerson)
             } else {
                 val person = Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
@@ -145,5 +145,5 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun savePurpose(purpose: Purpose): Purpose? = purposeRepository.saveAndFlush(purpose)
+    fun savePurpose(purpose: Purpose): Purpose = purposeRepository.saveAndFlush(purpose)
 }
