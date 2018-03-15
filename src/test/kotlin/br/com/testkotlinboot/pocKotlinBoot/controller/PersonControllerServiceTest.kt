@@ -12,7 +12,6 @@ import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import br.com.testkotlinboot.pocKotlinBoot.service.PersonControllerService
-import org.hibernate.Hibernate
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -128,7 +127,7 @@ internal class PersonControllerServiceTest {
 
     @Test
     fun savePerson() {
-        service.createPerson(PersonDTO(name = "Created Person",
+        service.createOrUpdatePerson(PersonDTO(name = "Created Person",
                 imagePath = "http://noimage.com",
                 phoneNumber = "3345678",
                 facebookId = "3",
@@ -143,7 +142,7 @@ internal class PersonControllerServiceTest {
 
     @Test
     fun savePersonWithExistedNumber() {
-        service.createPerson(PersonDTO(name = "Created Person",
+        service.createOrUpdatePerson(PersonDTO(name = "Created Person",
                 imagePath = "http://noimage.com",
                 phoneNumber = "88005553535",
                 facebookId = "2",
@@ -157,7 +156,7 @@ internal class PersonControllerServiceTest {
 
     @Test
     fun saveCardForPerson() {
-        val id = service.createPerson(PersonDTO(name = "Created Person",
+        val id = service.createOrUpdatePerson(PersonDTO(name = "Created Person",
                 imagePath = "http://noimage.com",
                 phoneNumber = "33456798",
                 facebookId = "4",

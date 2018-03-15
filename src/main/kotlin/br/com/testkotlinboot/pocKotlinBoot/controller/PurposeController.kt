@@ -29,7 +29,7 @@ class PurposeController(val purposeService: PurposeControllerService,
                          @RequestParam(value = "byId", required = false) id: Long?): Any = when {
         name != null -> purposeService.findPurposeByName(name)
         id != null -> personService.findByPersonId(id)
-        else -> mutableListOf<String>()
+        else -> mutableListOf<Any>()
     }
 
     @PostMapping("/")

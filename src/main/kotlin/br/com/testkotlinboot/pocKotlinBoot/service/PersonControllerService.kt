@@ -63,11 +63,22 @@ class PersonControllerService(
         personRepository.save(person)
     }
 
-    fun createPerson(createPerson: PersonDTO): Long {
-        if (personRepository.findByPhoneNumber(PhoneUtilClass.format(createPerson.phoneNumber)) != null &&
-                personRepository.findByFacebookId(createPerson.facebookId) != null) {
-            LOGGER.error("Person with phone ${createPerson.phoneNumber} and facebookId ${createPerson.facebookId} already exist")
-            return -1
+    fun createOrUpdatePerson(createPerson: PersonDTO): Long {
+        val personByFacebookId = personRepository.findByPhoneNumber(PhoneUtilClass.format(createPerson.phoneNumber))
+        val personByPhone = personRepository.findByFacebookId(createPerson.facebookId)
+
+        if (personByFacebookId != null || personByPhone != null) {
+            val person = if (personByFacebookId != null && personByPhone != null) personByPhone
+            else personByFacebookId ?: personByPhone
+
+            person?.name = createPerson.name
+            person?.facebookId = createPerson.facebookId
+            person?.imagePath = createPerson.imagePath
+            person?.email = createPerson.email
+
+            personRepository.saveAndFlush(person)
+
+            return 0
         }
 
         val person = Person(name = createPerson.name, imagePath = createPerson.imagePath, email = createPerson.email,

@@ -25,7 +25,7 @@ class PersonController(val personService: PersonControllerService) {
     fun addState(@RequestBody state: StatusUpdate) = personService.addState(state)
 
     @PostMapping("")
-    fun savePerson(@RequestBody createPerson: PersonDTO): Long = personService.createPerson(createPerson)
+    fun savePerson(@RequestBody createPerson: PersonDTO): Long = personService.createOrUpdatePerson(createPerson)
 
     @PostMapping("/{id}/card")
     fun saveCardForPerson(@PathVariable id: Long,
