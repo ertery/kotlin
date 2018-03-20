@@ -95,6 +95,10 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         val savedPurpose = purposeRepository.saveAndFlush(newPurpose)
         val savedPersons = personRepository.save(forSave)
 
+        forSave.filter { person -> !person.devices.isEmpty() }.forEach { person -> person.devices.forEach { device ->
+            CardUtilClass.sendPush(device.token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${newPurpose.name}")
+        }  }
+
         return mutableListOf(SavePurposeResponse(savedPurpose.purposeId, savedPersons.map { sp -> SavedPerson(sp.personId, PhoneUtilClass.format(sp.phoneNumber)) } as MutableList<SavedPerson>))
     }
 
@@ -110,7 +114,6 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
 
         val forSave: MutableList<Person> = mutableListOf()
 
-
         addedPersons.forEach {
             val person = personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber))
             if (person != null) {
@@ -122,7 +125,6 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
                     if (person.devices.size > 0) {
                         person.devices.forEach { device ->
                             CardUtilClass.sendPush(device.token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${purpose.name}")
-
                         }
                     }
                     LOGGER.info("Person with id ${person.personId} was successfully invited for purpose ${purpose.name}")

@@ -43,8 +43,8 @@ open class CardUtilClass(  @Value("\${password}") var password: String) {
             val fileName = Hibernate.getClass(this).classLoader.getResource("ThrowItOff.p12").file
             val file = File(fileName)
 
-            val service = APNS.newService().withCert(file.absolutePath, " ").withSandboxDestination().build()
-            val payload = APNS.newPayload().alertTitle(title).alertBody(body).  build()
+            val service = APNS.newService().withCert(file.absolutePath, "jGA76A8212345").withSandboxDestination().build()
+            val payload = APNS.newPayload().alertTitle(title).alertBody(body).build()
 
            service.push(token, payload)
         }
