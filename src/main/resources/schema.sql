@@ -1,103 +1,123 @@
 /*
-CREATE TYPE PAYMENTSTATE AS ENUM ('New', 'InProgress', 'Done', 'Declined');
+create type paymentstate as enum ('New', 'InProgress', 'Done', 'Declined')
+;
 
-CREATE TYPE PAYMENTMETHOD AS ENUM ('Cash', 'Clearing', 'Debt');
+create type paymentmethod as enum ('Cash', 'Clearing', 'Debt')
+;
 
-CREATE TYPE CHANNEL AS ENUM ('iOS', 'Telegramm');
+create type channel as enum ('iOS', 'Telegramm')
+;
 
-CREATE TYPE PERSONPURPOSESTATE AS ENUM ('Accept', 'Decline', 'InviteSend', 'Initial');
+create type personpurposestate as enum ('Accept', 'Decline', 'InviteSend', 'Initial')
+;
 
-CREATE TABLE purpose
+create table purpose
 (
-  purpose_id     BIGSERIAL        NOT NULL
-    CONSTRAINT purpose_pkey
-    PRIMARY KEY,
-  name           VARCHAR(255)     NOT NULL,
-  creationdate   TIMESTAMP,
-  finishdate     TIMESTAMP        NOT NULL,
-  targetammount  DOUBLE PRECISION NOT NULL,
-  currentammount DOUBLE PRECISION DEFAULT 0,
-  imageurl       VARCHAR(255),
-  description    VARCHAR(255),
-  initiator_id   BIGINT
-);
+  purpose_id bigserial not null
+    constraint purpose_pkey
+    primary key,
+  name varchar(255) not null,
+  creationdate timestamp,
+  finishdate timestamp not null,
+  targetammount double precision not null,
+  currentammount double precision default 0,
+  imageurl varchar(255),
+  description varchar(255),
+  initiator_id bigint
+)
+;
 
-CREATE TABLE person
+create table person
 (
-  person_id        BIGSERIAL    NOT NULL
-    CONSTRAINT person_pkey
-    PRIMARY KEY,
-  name             VARCHAR(255) NOT NULL,
-  registrationdate TIMESTAMP,
-  imagepath        VARCHAR(255),
-  phonenumber      VARCHAR(255),
-  email            VARCHAR(255),
-  facebookid       VARCHAR(255)
-);
+  person_id bigserial not null
+    constraint person_pkey
+    primary key,
+  name varchar(255) not null,
+  registrationdate timestamp,
+  imagepath varchar(255),
+  phonenumber varchar(255),
+  email varchar(255),
+  facebookid varchar(255)
+)
+;
 
-ALTER TABLE purpose
-  ADD CONSTRAINT purpose_person_person_id_fk
-FOREIGN KEY (initiator_id) REFERENCES person;
+alter table purpose
+  add constraint purpose_person_person_id_fk
+foreign key (initiator_id) references person
+;
 
-CREATE TABLE purpose_person
+create table purpose_person
 (
-  person_id     BIGSERIAL NOT NULL
-    CONSTRAINT payment_person_purpose_id_fkey1
-    REFERENCES person,
-  purpose_id    BIGSERIAL NOT NULL
-    CONSTRAINT payment_person_purpose_id_fkey
-    REFERENCES purpose,
-  purpose_state VARCHAR(255),
-  CONSTRAINT purpose_person_person_id_purpose_id_pk
-  UNIQUE (person_id, purpose_id)
-);
+  person_id bigserial not null
+    constraint payment_person_purpose_id_fkey1
+    references person,
+  purpose_id bigserial not null
+    constraint payment_person_purpose_id_fkey
+    references purpose,
+  purpose_state varchar(255),
+  constraint purpose_person_person_id_purpose_id_pk
+  unique (person_id, purpose_id)
+)
+;
 
-CREATE TABLE payment
+create table payment
 (
-  id            BIGSERIAL NOT NULL
-    CONSTRAINT payment_pkey
-    PRIMARY KEY,
-  amount        DOUBLE PRECISION DEFAULT 0,
-  paymentdate   DATE,
-  purpose_id    INTEGER
-    CONSTRAINT payment_purpose_id_fkey
-    REFERENCES purpose,
-  person_id     INTEGER
-    CONSTRAINT payment_person_id_fkey
-    REFERENCES person,
-  paymentmethod VARCHAR(255),
-  state         VARCHAR(255),
-  channel       VARCHAR(255)
-);
+  id bigserial not null
+    constraint payment_pkey
+    primary key,
+  amount double precision default 0,
+  paymentdate date,
+  purpose_id integer
+    constraint payment_purpose_id_fkey
+    references purpose,
+  person_id integer
+    constraint payment_person_id_fkey
+    references person,
+  paymentmethod varchar(255),
+  state varchar(255),
+  channel varchar(255)
+)
+;
 
-CREATE TABLE card
+create table card
 (
-  id             BIGSERIAL NOT NULL
-    CONSTRAINT card_pkey
-    PRIMARY KEY,
-  cardholdername VARCHAR(255),
-  number         VARCHAR(255),
-  validity       DATE,
-  person_id      INTEGER
-    CONSTRAINT card_person_id_fkey
-    REFERENCES person
-);
+  id bigserial not null
+    constraint card_pkey
+    primary key,
+  cardholdername varchar(255),
+  number varchar(255),
+  validity date,
+  person_id integer
+    constraint card_person_id_fkey
+    references person
+)
+;
 
-CREATE TABLE device_info
+create table device_info
 (
-  id        BIGSERIAL NOT NULL
-    CONSTRAINT device_info_pkey
-    PRIMARY KEY,
-  token     VARCHAR(255),
-  person_id BIGINT    NOT NULL
-    CONSTRAINT device_info_person_person_id_fk
-    REFERENCES person
-);
+  id bigserial not null
+    constraint device_info_pkey
+    primary key,
+  token varchar(255),
+  person_id bigint not null
+    constraint device_info_person_person_id_fk
+    references person
+)
+;
 
-CREATE UNIQUE INDEX device_info_id_uindex
-  ON device_info (id);
-
-CREATE UNIQUE INDEX device_info_token_uindex
-  ON device_info (token);
+create function truncate_tables(username character varying) returns void
+language plpgsql
+as $$
+DECLARE
+    statements CURSOR FOR
+    SELECT tablename FROM pg_tables
+    WHERE tableowner = username AND schemaname = 'public';
+BEGIN
+  FOR stmt IN statements LOOP
+    EXECUTE 'TRUNCATE TABLE ' || quote_ident(stmt.tablename) || ' CASCADE;';
+  END LOOP;
+END;
+$$
+;
 
 */

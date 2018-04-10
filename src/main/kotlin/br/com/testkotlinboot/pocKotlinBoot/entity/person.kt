@@ -43,9 +43,8 @@ data class Person(
     @OneToOne(mappedBy = "person", cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY)
     var paymentCard: PaymentCard? = null
 
-        override fun toString(): String =
-                "Person(personId=$personId, name='$name', registrationDate=$registrationDate, imagePath='$imagePath', phoneNumber='$phoneNumber', purposes=$purposes, facebookId='$facebookId')"
-
+    override fun toString(): String =
+            "Person(personId=$personId, name='$name', registrationDate=$registrationDate, imagePath='$imagePath', phoneNumber='$phoneNumber', purposes=$purposes, facebookId='$facebookId')"
 
 
 }
