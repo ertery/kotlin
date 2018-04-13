@@ -29,7 +29,8 @@ import java.util.*
 class AuthService(private val personRepository: PersonRepository,
                   val registrationRepository: RegistrationRepository,
                   val userDetailsService: CustomUserDetailsService,
-                  val sender: SMSender) {
+                  val sender: SMSender,
+                  val values: ServiceValues) {
 
     @Transactional
     fun sendSms(person: UnregisteredPerson): Boolean {
@@ -50,7 +51,7 @@ class AuthService(private val personRepository: PersonRepository,
         return false
     }
 
-    suspend fun send(person: UnregisteredPerson, code: String): Array<String> = sender.sendSms("7" + person.phoneNumber, "Код подтверждения номера: $code", "fake")
+    suspend fun send(person: UnregisteredPerson, code: String): Array<String> = sender.sendSms("7" + person.phoneNumber, "Код подтверждения номера: $code", values.fake.equals("fake"))
 
     @Transactional
     @Scheduled(cron = "0 * * * * ?")

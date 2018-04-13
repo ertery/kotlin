@@ -17,13 +17,12 @@ class SMSender(private final val values: ServiceValues) {
     private val SMSC_POST = false         // Использовать метод POST
 
 
-    fun sendSms(phones: String, message: String): Array<String> {
-        return sendSms(phones, message, 0, "", "", 0, "", "")
-    }
-
-    fun sendSms(phones: String, message: String, fake: String): Array<String> {
-        sleep(4000)
-        return arrayOf("FAKE", "1")
+    fun sendSms(phones: String, message: String, fake: Boolean): Array<String> {
+        return if (fake) {
+            sleep(4000)
+            arrayOf("FAKE", "1")
+        }
+        else sendSms(phones, message, 0, "", "", 0, "", "")
     }
 
     /**

@@ -79,7 +79,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
                 existPerson.purposes.add(pp)
                 forSave.add(existPerson)
             } else {
-                val person = Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
+                val person = Person(name = it.name!!, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
                 if (!forSave.any { p -> p.phoneNumber == person.phoneNumber }) {
                     val pp = PurposePerson(newPurpose, person)
                     val paymentCard = PaymentCard()
@@ -130,7 +130,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
                     LOGGER.info("Person with id ${person.personId} was successfully invited for purpose ${purpose.name}")
                 }
             } else {
-                val personSave = Person(name = it.name, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
+                val personSave = Person(name = it.name!!, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
                 if (!forSave.any { p -> p.phoneNumber == personSave.phoneNumber }) {
                     val pp = PurposePerson(purpose, personSave)
                     personSave.purposes.add(pp)

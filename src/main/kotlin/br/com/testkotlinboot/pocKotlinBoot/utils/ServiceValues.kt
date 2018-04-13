@@ -7,5 +7,6 @@ import org.springframework.stereotype.Component
 @ConfigurationProperties(prefix = "service.api")
 data class ServiceValues(var key:String = "",
                          var smsLogin: String = "",
-                         var smsPass: String = "") {
+                         var smsPass: String = "",
+                         var fake: String = "") {
 }
