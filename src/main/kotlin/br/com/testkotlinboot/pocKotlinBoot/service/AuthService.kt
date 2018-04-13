@@ -1,5 +1,6 @@
 package br.com.testkotlinboot.pocKotlinBoot.service
 
+import br.com.testkotlinboot.pocKotlinBoot.asecurity.CustomSecurityUser
 import br.com.testkotlinboot.pocKotlinBoot.asecurity.CustomUserDetailsService
 import br.com.testkotlinboot.pocKotlinBoot.dto.SMSCodeDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.UnregisteredPerson
@@ -10,6 +11,7 @@ import br.com.testkotlinboot.pocKotlinBoot.repository.RegistrationRepository
 import br.com.testkotlinboot.pocKotlinBoot.utils.CardUtilClass
 import br.com.testkotlinboot.pocKotlinBoot.utils.PhoneUtilClass
 import br.com.testkotlinboot.pocKotlinBoot.utils.SMSender
+import br.com.testkotlinboot.pocKotlinBoot.utils.ServiceValues
 import org.springframework.stereotype.Service
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
@@ -19,13 +21,15 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.springframework.security.core.userdetails.User
 import java.util.*
 
 
 @Service
 class AuthService(private val personRepository: PersonRepository,
                   val registrationRepository: RegistrationRepository,
-                  val userDetailsService: CustomUserDetailsService) {
+                  val userDetailsService: CustomUserDetailsService,
+                  val sender: SMSender) {
 
     @Transactional
     fun sendSms(person: UnregisteredPerson): Boolean {
@@ -33,20 +37,20 @@ class AuthService(private val personRepository: PersonRepository,
         val formattedPhone = PhoneUtilClass.format(person.phoneNumber)
         val code = CardUtilClass.generateCode()
 
-        val personByFacebookId = personRepository.findByPhoneNumber(formattedPhone)
-
-        var messages: Array<String> = emptyArray()
-        if (personByFacebookId == null) {
-            registrationRepository.saveAndFlush(Unregistered(phone = formattedPhone, code = code))
-            messages = runBlocking {
-                val l = async { send(person, code) }
-                l.await()
-            }
+        val messages: Array<String> = runBlocking {
+            val l = async { send(person, code) }
+            l.await()
         }
-        return Integer.valueOf(messages[1]) == 1
+
+        if (Integer.valueOf(messages[1]) == 1) {
+            registrationRepository.saveAndFlush(Unregistered(phone = formattedPhone, code = code))
+            return true
+        }
+
+        return false
     }
 
-    suspend fun send(person: UnregisteredPerson, code: String): Array<String> = SMSender().sendSms("7" + person.phoneNumber, "Код подтверждения номера: $code", "fake")
+    suspend fun send(person: UnregisteredPerson, code: String): Array<String> = sender.sendSms("7" + person.phoneNumber, "Код подтверждения номера: $code")
 
     @Transactional
     @Scheduled(cron = "0 * * * * ?")
@@ -57,42 +61,53 @@ class AuthService(private val personRepository: PersonRepository,
         }
         registrationRepository.delete(expiredRecords)
     }
-    
+
     private fun now() = LocalDateTime.now(ZoneId.of("Europe/Moscow")).minusMinutes(5)
 
-    fun checkSMSCode(auth: SMSCodeDTO): Boolean {
-            val formattedPhone = PhoneUtilClass.format(auth.phone)
+    @Transactional
+    fun checkSMSCode(auth: SMSCodeDTO): String? {
+        val formattedPhone = PhoneUtilClass.format(auth.phone)
 
-            val person = registrationRepository.findByCode(auth.code) ?: return false
-            if (person.phone != formattedPhone) return false
+        val person = registrationRepository.findByCode(auth.code) ?: return null
+        if (person.phone != formattedPhone) return null
 
-            val records = registrationRepository.findByPhone(formattedPhone)
-            if (!records.isEmpty()) {
-                registrationRepository.delete(records)
-            }
+        val records = registrationRepository.findByPhone(formattedPhone)
+        if (!records.isEmpty()) {
+            registrationRepository.delete(records)
+        }
 
-            personRepository.saveAndFlush(Person(phoneNumber = auth.phone))
+        val personByPhone = personRepository.findByPhoneNumber(formattedPhone)
 
-            return true
+        val savedPerson: Person = personByPhone ?: personRepository.saveAndFlush(Person(phoneNumber = auth.phone))
+
+        val token = getToken(savedPerson.phoneNumber, auth.code)
+
+        if (token != null) {
+            savedPerson.token = token
+            personRepository.saveAndFlush(savedPerson)
+        }
+
+        return token
     }
 
 
+    @Transactional
     fun getToken(username: String?, password: String?): String? {
         if (username == null || password == null)
             return null
-        val user = userDetailsService.loadUserByUsername(username) as Person
+        val user = userDetailsService.loadUserByUsername(username) as CustomSecurityUser
         val tokenData = HashMap<String, Any>()
-            tokenData["clientType"] = "user"
-            tokenData["userID"] = user.personId
-            tokenData["username"] = user.phoneNumber
-            tokenData["token_create_date"] = Date().time
-            val calendar = Calendar.getInstance()
-            calendar.add(Calendar.YEAR, 3)
-            tokenData["token_expiration_date"] = calendar.time
-            val jwtBuilder = Jwts.builder()
-            jwtBuilder.setExpiration(calendar.time)
-            jwtBuilder.setClaims(tokenData)
-            val key = "abc123"
-            return jwtBuilder.signWith(SignatureAlgorithm.HS512, key).compact()
+        tokenData["clientType"] = "user"
+        tokenData["userID"] = user.id
+        tokenData["username"] = user.username
+        tokenData["token_create_date"] = Date().time
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.YEAR, 3)
+        tokenData["token_expiration_date"] = calendar.time
+        val jwtBuilder = Jwts.builder()
+        jwtBuilder.setExpiration(calendar.time)
+        jwtBuilder.setClaims(tokenData)
+        val key = "abc123"
+        return jwtBuilder.signWith(SignatureAlgorithm.HS512, key).compact()
     }
 }

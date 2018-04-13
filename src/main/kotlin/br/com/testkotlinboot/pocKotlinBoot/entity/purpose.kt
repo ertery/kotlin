@@ -68,7 +68,7 @@ data class Purpose(
                             PaymentList(id = payment.id, ammount = payment.amount, paymentDate = payment.paymentDate, paymentMethod = payment.paymentMethod.toString())
                         } as MutableList<PaymentList>,
                         email = pp.person.email,
-                        purposeState = pp.purposeState.toString(),
+                        purposeState = pp.purposeState.toString() ,
                         phoneNumber = pp.person.phoneNumber)
             } as MutableList<PersonList>
     )

@@ -1,14 +1,16 @@
 package br.com.testkotlinboot.pocKotlinBoot.utils
 
+import org.springframework.stereotype.Service
 import java.io.*
 import java.lang.Thread.sleep
 import java.net.URL
 import java.net.URLEncoder
 
-class SMSender {
+@Service
+class SMSender(private final val values: ServiceValues) {
 
-    private val SMSC_LOGIN = ""     // логин клиента
-    private val SMSC_PASSWORD = ""  // пароль
+    private val SMSC_LOGIN = values.smsLogin    // логин клиента
+    private val SMSC_PASSWORD = values.smsPass // пароль
     private val SMSC_HTTPS = true         // использовать HTTPS протокол
     private val SMSC_CHARSET = "utf-8"       // кодировка сообщения: koi8-r, windows-1251 или utf-8 (по умолчанию)
     private val SMSC_DEBUG = true         // флаг отладки

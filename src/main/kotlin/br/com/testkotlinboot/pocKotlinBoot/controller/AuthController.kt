@@ -22,7 +22,11 @@ class AuthController(val authService: AuthService) {
     }
 
     @PostMapping("/authorize/code")
-    fun checkSMSCode(@RequestBody auth: SMSCodeDTO){
-        authService.checkSMSCode(auth)
+    fun checkSMSCode(@RequestBody auth: SMSCodeDTO): ResponseEntity<String> {
+        val token = authService.checkSMSCode(auth)
+        return if (token == null) {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+        else ResponseEntity.ok().body(token)
     }
 }

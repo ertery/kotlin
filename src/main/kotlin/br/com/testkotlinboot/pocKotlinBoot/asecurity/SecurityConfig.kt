@@ -1,30 +1,35 @@
 package br.com.testkotlinboot.pocKotlinBoot.asecurity
 
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+
+
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig( private val userDetailsService: CustomUserDetailsService, disableDefaults: Boolean) : WebSecurityConfigurerAdapter(disableDefaults) {
+@EnableGlobalMethodSecurity(securedEnabled = true)
+class SecurityConfig(val tokenAuthenticationManager: TokenAuthenticationManager) : WebSecurityConfigurerAdapter(false) {
 
-
-    override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.userDetailsService(userDetailsService)
-    }
 
     override fun configure(http: HttpSecurity) {
         http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .headers().frameOptions().sameOrigin()
                 .and()
-                .httpBasic()
-                .and()
-                .csrf()
-                .disable()
+                .addFilterAfter(tokenAuthenticationFilter(), BasicAuthenticationFilter::class.java)
+                .authorizeRequests()
+                .antMatchers("/person/*").authenticated()
+                .and().csrf().disable()
+    }
 
+    @Bean(name = arrayOf("restTokenAuthenticationFilter"))
+    fun tokenAuthenticationFilter(): TokenAuthenticationFilter {
+        val restTokenAuthenticationFilter = TokenAuthenticationFilter()
+        restTokenAuthenticationFilter.setAuthenticationManager(tokenAuthenticationManager)
+        return restTokenAuthenticationFilter
     }
 }

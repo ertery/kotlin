@@ -1,11 +1,15 @@
 package br.com.testkotlinboot.pocKotlinBoot.asecurity
 
+import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.stereotype.Service
 
-class CustomUserDetailsService: UserDetailsService {
+@Service
+class CustomUserDetailsService(val personRepository: PersonRepository): UserDetailsService {
 
-    override fun loadUserByUsername(username: String?): UserDetails {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun loadUserByUsername(phone: String?): UserDetails {
+        val person  = personRepository.findByPhoneNumber(phone!!)
+        return CustomSecurityUser(person!!.personId,  person!!.phoneNumber)
     }
 }

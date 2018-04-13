@@ -38,7 +38,10 @@ data class Person(
         var purposes: MutableList<PurposePerson> = mutableListOf(),
 
         @Column(name = "facebookid")
-        var facebookId: String = " "
+        var facebookId: String = "",
+
+        @Column
+        var token: String = ""
 ) {
     @OneToOne(mappedBy = "person", cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY)
     var paymentCard: PaymentCard? = null
