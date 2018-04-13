@@ -50,7 +50,7 @@ class AuthService(private val personRepository: PersonRepository,
         return false
     }
 
-    suspend fun send(person: UnregisteredPerson, code: String): Array<String> = sender.sendSms("7" + person.phoneNumber, "Код подтверждения номера: $code")
+    suspend fun send(person: UnregisteredPerson, code: String): Array<String> = sender.sendSms("7" + person.phoneNumber, "Код подтверждения номера: $code", "fake")
 
     @Transactional
     @Scheduled(cron = "0 * * * * ?")
@@ -66,7 +66,7 @@ class AuthService(private val personRepository: PersonRepository,
 
     @Transactional
     fun checkSMSCode(auth: SMSCodeDTO): String? {
-        val formattedPhone = PhoneUtilClass.format(auth.phone)
+        val formattedPhone = PhoneUtilClass.format(auth.phoneNumber)
 
         val person = registrationRepository.findByCode(auth.code) ?: return null
         if (person.phone != formattedPhone) return null
@@ -78,7 +78,7 @@ class AuthService(private val personRepository: PersonRepository,
 
         val personByPhone = personRepository.findByPhoneNumber(formattedPhone)
 
-        val savedPerson: Person = personByPhone ?: personRepository.saveAndFlush(Person(phoneNumber = auth.phone))
+        val savedPerson: Person = personByPhone ?: personRepository.saveAndFlush(Person(phoneNumber = auth.phoneNumber))
 
         val token = getToken(savedPerson.phoneNumber, auth.code)
 
