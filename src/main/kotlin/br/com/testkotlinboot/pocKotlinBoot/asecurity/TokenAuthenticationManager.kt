@@ -30,7 +30,7 @@ class TokenAuthenticationManager(val userDetailsService: UserDetailsService,val 
         try {
             claims = Jwts.parser().setSigningKey(key).parse(token).body as DefaultClaims
         } catch (ex: Exception) {
-            throw AuthenticationServiceException("Token corrupted")
+            throw AuthenticationServiceException("Token corrupted") as Throwable
         }
 
         if (claims.get("token_expiration_date", Date::class.java) == null)

@@ -41,7 +41,10 @@ data class Person(
         var facebookId: String = "",
 
         @Column
-        var token: String = ""
+        var token: String = "",
+
+        @Column(name = "yandex")
+        var yandexConnected: Boolean = false
 ) {
     @OneToOne(mappedBy = "person", cascade = arrayOf(CascadeType.ALL), fetch = FetchType.LAZY)
     var paymentCard: PaymentCard? = null

@@ -10,6 +10,9 @@ import br.com.testkotlinboot.pocKotlinBoot.repository.DeviceInfoRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import br.com.testkotlinboot.pocKotlinBoot.utils.PhoneUtilClass
+import br.com.testkotlinboot.pocKotlinBoot.utils.ServiceValues
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.impl.DefaultClaims
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,7 +24,8 @@ import java.time.format.DateTimeFormatter
 class PersonControllerService(
         val personRepository: PersonRepository,
         val purposeRepository: PurposeRepository,
-        val deviceInfoRepository: DeviceInfoRepository
+        val deviceInfoRepository: DeviceInfoRepository,
+        val values: ServiceValues
 ) {
 
 
@@ -58,8 +62,7 @@ class PersonControllerService(
     @Transactional
     fun updateState(status: StatusUpdate) {
         val person = personRepository.findOne(status.personId)
-        person.purposes.filter { (purpose) -> purpose.purposeId == status.purposeId }.
-                forEach { it.purposeState = PersonPurposeState.valueOf(status.state.toUpperCase()) }
+        person.purposes.filter { (purpose) -> purpose.purposeId == status.purposeId }.forEach { it.purposeState = PersonPurposeState.valueOf(status.state.toUpperCase()) }
         personRepository.save(person)
     }
 
@@ -150,5 +153,15 @@ class PersonControllerService(
         }
 
         personRepository.saveAndFlush(person)
+    }
+
+    fun togglePerson(toggle: YandexToggleDTO, token: String?): Boolean {
+        val key = values.key
+        val claims = Jwts.parser().setSigningKey(key).parse(token).body as DefaultClaims
+        val personId = claims.get("userID", Integer::class.java) ?: return false
+        val person = personRepository.findOne(personId.toLong()) ?: return false
+        person.yandexConnected = toggle.connect
+        personRepository.save(person)
+        return true
     }
 }

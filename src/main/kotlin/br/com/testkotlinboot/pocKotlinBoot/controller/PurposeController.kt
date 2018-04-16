@@ -26,9 +26,11 @@ class PurposeController(val purposeService: PurposeControllerService,
 
     @GetMapping("/find")
     fun getPurposeByName(@RequestParam(value = "byName", required = false) name: String?,
-                         @RequestParam(value = "byId", required = false) id: Long?): Any = when {
+                         @RequestParam(value = "byId", required = false) id: Long?,
+                         @RequestParam(value = "state", required = false) state: String?): Any = when {
         name != null -> purposeService.findPurposeByName(name)
-        id != null -> personService.findByPersonId(id)
+        id != null && state != null -> purposeService.findByPersonIdAndState(id, state, false)
+        id != null -> purposeService.findByPersonIdAndState(id, "ACCEPT", true)
         else -> mutableListOf<Any>()
     }
 

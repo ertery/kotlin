@@ -21,7 +21,6 @@ import javax.annotation.Resource
 
 
 @Service("proxy")
-
 class PurposeControllerService(val purposeRepository: PurposeRepository, val personRepository: PersonRepository) {
 
     val LOGGER = LoggerFactory.getLogger(PurposeControllerService::class.java.name)
@@ -95,9 +94,11 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         val savedPurpose = purposeRepository.saveAndFlush(newPurpose)
         val savedPersons = personRepository.save(forSave)
 
-        forSave.filter { person -> !person.devices.isEmpty() }.forEach { person -> person.devices.forEach { device ->
-            CardUtilClass.sendPush(device.token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${newPurpose.name}")
-        }  }
+        forSave.filter { person -> !person.devices.isEmpty() }.forEach { person ->
+            person.devices.forEach { device ->
+                CardUtilClass.sendPush(device.token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${newPurpose.name}")
+            }
+        }
 
         return mutableListOf(SavePurposeResponse(savedPurpose.purposeId, savedPersons.map { sp -> SavedPerson(sp.personId, PhoneUtilClass.format(sp.phoneNumber)) } as MutableList<SavedPerson>))
     }
@@ -144,6 +145,28 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         personRepository.save(forSave)
 
         return 0
+    }
+
+    @Transactional
+    fun findByPersonIdAndState(personId: Long, state: String, applySecondCondition: Boolean): Any {
+        LOGGER.info("Get purposes by person id: $personId")
+        val person: Person = personRepository.findOne(personId) ?: return arrayListOf<String>()
+
+        try {
+            PersonPurposeState.valueOf(state.toUpperCase())
+        } catch (e: Exception) {
+           return arrayListOf<String>()
+        }
+
+        val purposes: MutableList<PurposeRecord> = mutableListOf()
+        person.purposes
+                .filter { it -> (it.purposeState == PersonPurposeState.valueOf(state.toUpperCase()) || (applySecondCondition && it.purposeState == PersonPurposeState.INITIAL)) }
+                .forEach { (purpose) ->
+                    val record: PurposeRecord = purpose.toDTO(true)
+                    record.isInitial = personId == purpose.initiatorId
+                    purposes.add(record)
+                }
+        return purposes
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
