@@ -79,12 +79,13 @@ class AuthService(private val personRepository: PersonRepository,
 
         val personByPhone = personRepository.findByPhoneNumber(formattedPhone)
 
-        val savedPerson: Person = personByPhone ?: personRepository.saveAndFlush(Person(phoneNumber = auth.phoneNumber, name = person.name))
+        val savedPerson: Person = personByPhone ?: personRepository.saveAndFlush(Person(phoneNumber = auth.phoneNumber))
 
         val token = getToken(savedPerson.phoneNumber, auth.code)
 
         if (token != null) {
             savedPerson.token = token
+            savedPerson.name = person.name
             personRepository.saveAndFlush(savedPerson)
         }
 
