@@ -10,6 +10,6 @@ class CustomUserDetailsService(val personRepository: PersonRepository): UserDeta
 
     override fun loadUserByUsername(phone: String?): UserDetails {
         val person  = personRepository.findByPhoneNumber(phone!!)
-        return CustomSecurityUser(person!!.personId,  person!!.phoneNumber)
+        return CustomSecurityUser(person!!.personId,  person.phoneNumber)
     }
 }

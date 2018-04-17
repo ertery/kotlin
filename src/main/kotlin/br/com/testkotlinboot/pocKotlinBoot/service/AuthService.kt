@@ -44,7 +44,7 @@ class AuthService(private val personRepository: PersonRepository,
         }
 
         if (Integer.valueOf(messages[1]) == 1) {
-            registrationRepository.saveAndFlush(Unregistered(phone = formattedPhone, code = code))
+            registrationRepository.saveAndFlush(Unregistered(phone = formattedPhone, code = code, name = person.name ?: "" ))
             return true
         }
 
@@ -79,7 +79,7 @@ class AuthService(private val personRepository: PersonRepository,
 
         val personByPhone = personRepository.findByPhoneNumber(formattedPhone)
 
-        val savedPerson: Person = personByPhone ?: personRepository.saveAndFlush(Person(phoneNumber = auth.phoneNumber))
+        val savedPerson: Person = personByPhone ?: personRepository.saveAndFlush(Person(phoneNumber = auth.phoneNumber, name = person.name))
 
         val token = getToken(savedPerson.phoneNumber, auth.code)
 
