@@ -16,6 +16,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import javax.annotation.Resource
+import kotlin.system.exitProcess
 
 
 @Service("proxy")
@@ -32,7 +33,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         val findAll = purposeRepository.findAll().filter { it -> !it.archived }
         val user = authService.decodeToken(authorization!!)
         val records: MutableList<PurposeRecord> = mutableListOf()
-        findAll.filter {it -> it.persons.filter { it1 -> it1.person.personId == user}.count() == 1}.forEach { purpose -> records.add(purpose.toDTO(false)) }
+        findAll.filter { it -> it.persons.filter { it1 -> it1.person.personId == user }.count() == 1 }.forEach { purpose -> records.add(purpose.toDTO(false)) }
         return records
     }
 
@@ -43,15 +44,14 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
 
     fun findPurposeByName(name: String): Any? {
         val findByName = purposeRepository.findByName(name)
-        return if (findByName.archived){
+        return if (findByName.archived) {
             null
-        }
-        else findByName.toDTO(true)
+        } else findByName.toDTO(true)
     }
 
     @Transactional
     fun addPurpose(purpose: CreatePurpose, authorization: String?): Any? {
-        val initiatorId = authService.decodeToken(authorization!!)?: return null
+        val initiatorId = authService.decodeToken(authorization!!) ?: return null
         val createPurpose = Purpose(name = purpose.name,
                 targetAmmount = purpose.targetAmmount,
                 finishDate = LocalDateTime.of(purpose.finishDate, LocalTime.now(ZoneId.of("Europe/Moscow"))),
@@ -158,7 +158,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         try {
             PersonPurposeState.valueOf(state.toUpperCase())
         } catch (e: Exception) {
-           return arrayListOf<String>()
+            return arrayListOf<String>()
         }
 
         val purposes: MutableList<PurposeRecord> = mutableListOf()
@@ -176,11 +176,11 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
     fun savePurpose(purpose: Purpose): Purpose = purposeRepository.saveAndFlush(purpose)
 
     @Transactional
-    fun deletePurpose(purposeId: Long, authorization: String?):Boolean {
-        val purpose =  purposeRepository.getOne(purposeId)
+    fun deletePurpose(purposeId: Long, authorization: String?): Boolean {
+        val purpose = purposeRepository.getOne(purposeId)
         purpose?.let {
-            val initPerson =  purpose.persons.filter { it.purposeState == PersonPurposeState.INITIAL}[0]
-            if (initPerson.person.personId != authService.decodeToken(authorization!!)){
+            val initPerson = purpose.persons.filter { it.purposeState == PersonPurposeState.INITIAL }[0]
+            if (initPerson.person.personId != authService.decodeToken(authorization!!)) {
                 return false
             }
             purpose.archived = true
@@ -188,5 +188,22 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
             return true
         }
         return false
+    }
+
+    @Transactional
+    fun modifyPurpose(authorization: String?, purposeModify: PurposeModifyDTO, purposeId: Long): Boolean {
+        val purpose = purposeRepository.getOne(purposeId)
+        val userId = authService.decodeToken(authorization!!)
+        if (purpose.persons.filter { it -> it.person.personId == userId && it.purposeState == PersonPurposeState.INITIAL }.size != 1) {
+            return false
+        }
+        purposeModify.description?.let { purpose.description = it }
+        purposeModify.finishDate?.let { purpose.finishDate = it.atTime(23, 59)}
+        purposeModify.imageUrl?.let { purpose.imageUrl = it }
+        purposeModify.targetAmmount?.let { purpose.targetAmmount = it }
+
+        purposeRepository.save(purpose)
+
+        return true
     }
 }

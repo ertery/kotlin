@@ -40,6 +40,7 @@ data class Purpose(
         @Column(name = "imageurl")
         var imageUrl: String = "",
 
+        @Column
         var description: String = "",
 
         @Column

@@ -1,9 +1,6 @@
 package br.com.testkotlinboot.pocKotlinBoot.controller
 
-import br.com.testkotlinboot.pocKotlinBoot.dto.CodeDTO
-import br.com.testkotlinboot.pocKotlinBoot.dto.CreatePurpose
-import br.com.testkotlinboot.pocKotlinBoot.dto.PaymentDTO
-import br.com.testkotlinboot.pocKotlinBoot.dto.UnregisteredPerson
+import br.com.testkotlinboot.pocKotlinBoot.dto.*
 import br.com.testkotlinboot.pocKotlinBoot.service.AuthService
 import br.com.testkotlinboot.pocKotlinBoot.service.PaymentControllerService
 import br.com.testkotlinboot.pocKotlinBoot.service.PurposeControllerService
@@ -79,14 +76,28 @@ class PurposeController(val purposeService: PurposeControllerService,
         return ResponseEntity(HttpStatus.BAD_REQUEST)
     }
 
-    @DeleteMapping("{purposeId}/delete")
+    @DeleteMapping("{purposeId}")
     fun delete(@RequestHeader("Authorization", required = false) authorization: String?,
                @PathVariable purposeId: Long): ResponseEntity<Any> {
         if (authorization.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
-        return if  (purposeService.deletePurpose(purposeId, authorization)) {
+        return if (purposeService.deletePurpose(purposeId, authorization)) {
             ResponseEntity(HttpStatus.OK)
         } else ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
+    }
+
+    @PutMapping("{purposeId}")
+    fun modifyCompany(@RequestHeader("Authorization", required = false) authorization: String?,
+                      @PathVariable purposeId: Long,
+                      @RequestBody purpose: PurposeModifyDTO): ResponseEntity<Any> {
+        if (authorization.isNullOrBlank()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        return if (purposeService.modifyPurpose(authorization, purpose, purposeId)) {
+            ResponseEntity(HttpStatus.OK)
+        } else {
+            ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
+        }
     }
 }
