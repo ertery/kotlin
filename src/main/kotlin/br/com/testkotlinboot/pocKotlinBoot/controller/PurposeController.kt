@@ -49,8 +49,7 @@ class PurposeController(val purposeService: PurposeControllerService,
         if (authorization.isNullOrBlank()) {
             return ResponseEntity<HttpStatus>(HttpStatus.BAD_REQUEST)
         }
-        purposeService.addPurpose(newPurpose, authorization)
-        return HttpStatus.OK
+        return  ResponseEntity(purposeService.addPurpose(newPurpose, authorization), HttpStatus.OK)
     }
 
     @PostMapping("/{id}/person")

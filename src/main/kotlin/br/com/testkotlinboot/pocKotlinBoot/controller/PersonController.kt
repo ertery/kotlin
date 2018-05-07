@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.*
 class PersonController(val personService: PersonControllerService, val authService: AuthService) {
 
     @GetMapping("/")
-    fun getPurposeByPersonId(@RequestHeader("Authorization", required = false) authorization: String?): ResponseEntity<String> {
+    fun getPurposeByPersonId(@RequestHeader("Authorization", required = false) authorization: String?): ResponseEntity<Any> {
         if (authorization == null && authorization.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
-        personService.findByPersonId(authService.decodeToken(authorization!!)!!)
-        return ResponseEntity(HttpStatus.OK)
+
+        return ResponseEntity(personService.findByPersonId(authService.decodeToken(authorization!!)!!), HttpStatus.OK)
     }
 
     @GetMapping("/facebook/{id}")
