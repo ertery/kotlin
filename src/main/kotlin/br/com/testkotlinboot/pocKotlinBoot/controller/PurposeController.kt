@@ -20,8 +20,13 @@ class PurposeController(val purposeService: PurposeControllerService,
                         val paymentService: PaymentControllerService) {
 
 
-    @RequestMapping("/")
-    fun getPurposes() = purposeService.getPurposes()
+    @GetMapping("/")
+    fun getPurposes(@RequestHeader(value = "Authorization", required = false) authorization: String?):ResponseEntity<Any> {
+        if (authorization.isNullOrBlank()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        return ResponseEntity(purposeService.getPurposes(authorization), HttpStatus.OK)
+    }
 
     @GetMapping("/{id}")
     fun getPurposeById(@PathVariable id: Long) = purposeService.getPurposeById(id)

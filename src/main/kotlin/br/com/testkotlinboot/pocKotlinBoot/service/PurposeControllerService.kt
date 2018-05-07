@@ -28,10 +28,11 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
     @Resource(name = "proxy")
     lateinit var selfRef: PurposeControllerService
 
-    fun getPurposes(): Any {
+    fun getPurposes(authorization: String?): Any {
         val findAll = purposeRepository.findAll()
+        val user = authService.decodeToken(authorization!!)
         val records: MutableList<PurposeRecord> = mutableListOf()
-        findAll.forEach { purpose -> records.add(purpose.toDTO(false)) }
+        findAll.filter {it -> it.persons.filter { it1 -> it1.person.personId == user}.count() == 1}.forEach { purpose -> records.add(purpose.toDTO(false)) }
         return records
     }
 
