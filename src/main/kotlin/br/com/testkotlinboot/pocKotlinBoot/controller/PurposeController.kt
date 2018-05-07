@@ -6,7 +6,6 @@ import br.com.testkotlinboot.pocKotlinBoot.dto.PaymentDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.UnregisteredPerson
 import br.com.testkotlinboot.pocKotlinBoot.service.AuthService
 import br.com.testkotlinboot.pocKotlinBoot.service.PaymentControllerService
-import br.com.testkotlinboot.pocKotlinBoot.service.PersonControllerService
 import br.com.testkotlinboot.pocKotlinBoot.service.PurposeControllerService
 import br.com.testkotlinboot.pocKotlinBoot.utils.CardUtilClass
 import org.springframework.http.HttpStatus
@@ -45,7 +44,14 @@ class PurposeController(val purposeService: PurposeControllerService,
     }
 
     @PostMapping("/")
-    fun addPurpose(@RequestBody newPurpose: CreatePurpose): Any = purposeService.addPurpose(newPurpose)
+    fun addPurpose(@RequestBody newPurpose: CreatePurpose,
+                   @RequestHeader(value = "Authorization", required = false) authorization: String?): Any {
+        if (authorization.isNullOrBlank()) {
+            return ResponseEntity<HttpStatus>(HttpStatus.BAD_REQUEST)
+        }
+        purposeService.addPurpose(newPurpose, authorization)
+        return HttpStatus.OK
+    }
 
     @PostMapping("/{id}/person")
     fun addPersonsToPurpose(@PathVariable id: Long,
