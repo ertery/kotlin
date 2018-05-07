@@ -9,8 +9,6 @@ import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import br.com.testkotlinboot.pocKotlinBoot.utils.CardUtilClass
 import br.com.testkotlinboot.pocKotlinBoot.utils.PhoneUtilClass
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.Example
-import org.springframework.data.domain.ExampleMatcher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional

@@ -25,6 +25,7 @@ class PersonControllerService(
         val personRepository: PersonRepository,
         val purposeRepository: PurposeRepository,
         val deviceInfoRepository: DeviceInfoRepository,
+        val authService: AuthService,
         val values: ServiceValues
 ) {
 
@@ -60,8 +61,8 @@ class PersonControllerService(
     }
 
     @Transactional
-    fun updateState(status: StatusUpdate) {
-        val person = personRepository.findOne(status.personId)
+    fun updateState(status: StatusUpdate, authorization: String) {
+        val person = personRepository.findOne(authService.decodeToken(authorization))
         person.purposes.filter { (purpose) -> purpose.purposeId == status.purposeId }.forEach { it.purposeState = PersonPurposeState.valueOf(status.state.toUpperCase()) }
         personRepository.save(person)
     }
@@ -141,8 +142,8 @@ class PersonControllerService(
     }
 
     @Transactional
-    fun addToken(token: TokenDTO) {
-        val person = personRepository.findByFacebookId(token.facebookId)
+    fun addToken(token: TokenDTO, authorization: String) {
+        val person = personRepository.findOne(authService.decodeToken(authorization))
 
         val device = Device(id = null, token = token.token)
 

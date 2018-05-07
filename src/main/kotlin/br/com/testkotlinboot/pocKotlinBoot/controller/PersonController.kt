@@ -4,22 +4,38 @@ import br.com.testkotlinboot.pocKotlinBoot.dto.CardDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.PersonDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.StatusUpdate
 import br.com.testkotlinboot.pocKotlinBoot.dto.TokenDTO
+import br.com.testkotlinboot.pocKotlinBoot.service.AuthService
 import br.com.testkotlinboot.pocKotlinBoot.service.PersonControllerService
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 
 @RestController
 @RequestMapping("/person")
-class PersonController(val personService: PersonControllerService) {
+class PersonController(val personService: PersonControllerService, val authService: AuthService) {
 
-    @GetMapping("/{id}")
-    fun getPurposeByPersonId(@PathVariable id: Long) = personService.findByPersonId(id)
+    @GetMapping("/")
+    fun getPurposeByPersonId(@RequestHeader("аuthorization", required = false) authorization: String?): ResponseEntity<String> {
+        if (authorization == null && authorization.isNullOrBlank()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        personService.findByPersonId(authService.decodeToken(authorization!!)!!)
+        return ResponseEntity(HttpStatus.OK)
+    }
 
     @GetMapping("/facebook/{id}")
     fun getPersonByFacebookId(@PathVariable id: String) = personService.findPersonByFacebookId(id)
 
     @PutMapping("/state")
-    fun updateState(@RequestBody status: StatusUpdate) = personService.updateState(status)
+    fun updateState(@RequestHeader("аuthorization", required = false) authorization: String?,
+                    @RequestBody status: StatusUpdate) : ResponseEntity<String> {
+        if (authorization == null && authorization.isNullOrBlank()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        personService.updateState(status, authorization!!)
+        return ResponseEntity(HttpStatus.OK)
+    }
 
     @PostMapping("/state")
     fun addState(@RequestBody state: StatusUpdate) = personService.addState(state)
@@ -27,17 +43,14 @@ class PersonController(val personService: PersonControllerService) {
     @PostMapping("")
     fun savePerson(@RequestBody createPerson: PersonDTO): Long = personService.createOrUpdatePerson(createPerson)
 
-    @PostMapping("/{id}/card")
-    fun saveCardForPerson(@PathVariable id: Long,
-                          @RequestBody card: CardDTO): Long? = personService.addCard(id, card)
-
-    @PutMapping("/{id}/card")
-    fun updateCardForPerson(@PathVariable id: Long,
-                            @RequestBody card: CardDTO): Long? = personService.updateCard(id, card)
-
     @PutMapping("/token")
-    fun addTokenForPerson(@RequestBody token: TokenDTO){
-        personService.addToken(token)
+    fun addTokenForPerson(@RequestBody token: TokenDTO,
+                          @RequestHeader("Authorization", required = false) authorization: String?): ResponseEntity<String> {
+        if (authorization.isNullOrBlank()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        personService.addToken(token, authorization.toString())
+        return ResponseEntity(HttpStatus.OK)
     }
 
 }

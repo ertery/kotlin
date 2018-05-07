@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
-import org.springframework.security.core.userdetails.User
+import io.jsonwebtoken.impl.DefaultClaims
 import java.util.*
 
 
@@ -109,7 +109,15 @@ class AuthService(private val personRepository: PersonRepository,
         val jwtBuilder = Jwts.builder()
         jwtBuilder.setExpiration(calendar.time)
         jwtBuilder.setClaims(tokenData)
-        val key = "abc123"
+        val key =  values.key
         return jwtBuilder.signWith(SignatureAlgorithm.HS512, key).compact()
+    }
+
+    fun decodeToken(authentication: String): Long? {
+        val key = values.key
+        val claims = Jwts.parser().setSigningKey(key).parse(authentication).body as DefaultClaims
+        val value = claims.get("userID", Integer::class.java)
+        value?.let { return it.toLong() }
+        return null
     }
 }

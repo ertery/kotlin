@@ -17,21 +17,26 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class PaymentControllerService(val paymentRepository: PaymentRepository, val personRepository: PersonRepository, val purposeRepository: PurposeRepository) {
+class PaymentControllerService(val paymentRepository: PaymentRepository,
+                               val personRepository: PersonRepository,
+                               val purposeRepository: PurposeRepository,
+                               val authService: AuthService) {
 
     private val LOGGER = LoggerFactory.getLogger(PersonControllerService::class.java)
 
-    fun createNewPayment(purposeId: Long, personId: Long, newPayment: PaymentDTO): Payment? {
+    fun createNewPayment(purposeId: Long, authorization: String, newPayment: PaymentDTO): Payment? {
 
         val payment = Payment(amount = newPayment.ammount)
         payment.paymentMethod = PaymentMethod.valueOf(newPayment.paymentMethod.toUpperCase())
         payment.channel = Channel.valueOf(newPayment.channel.toUpperCase())
         payment.state = PaymentState.NEW
 
-        val person = personRepository.findOne(personId)
+        val person = personRepository.findOne(authService.decodeToken(authorization))
         val purpose = purposeRepository.findOne(purposeId)
 
-        if (person == null || purpose == null) return Payment(id = 0)
+        if (person == null || purpose == null) {
+            return null
+        }
 
         payment.person = person
         payment.purpose = purpose

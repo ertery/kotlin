@@ -4,17 +4,20 @@ import br.com.testkotlinboot.pocKotlinBoot.dto.CodeDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.CreatePurpose
 import br.com.testkotlinboot.pocKotlinBoot.dto.PaymentDTO
 import br.com.testkotlinboot.pocKotlinBoot.dto.UnregisteredPerson
+import br.com.testkotlinboot.pocKotlinBoot.service.AuthService
 import br.com.testkotlinboot.pocKotlinBoot.service.PaymentControllerService
 import br.com.testkotlinboot.pocKotlinBoot.service.PersonControllerService
 import br.com.testkotlinboot.pocKotlinBoot.service.PurposeControllerService
 import br.com.testkotlinboot.pocKotlinBoot.utils.CardUtilClass
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 
 @RestController
 @RequestMapping("/purpose")
 class PurposeController(val purposeService: PurposeControllerService,
-                        val personService: PersonControllerService,
+                        val authService: AuthService,
                         val paymentService: PaymentControllerService) {
 
 
@@ -25,13 +28,20 @@ class PurposeController(val purposeService: PurposeControllerService,
     fun getPurposeById(@PathVariable id: Long) = purposeService.getPurposeById(id)
 
     @GetMapping("/find")
-    fun getPurposeByName(@RequestParam(value = "byName", required = false) name: String?,
-                         @RequestParam(value = "byId", required = false) id: Long?,
-                         @RequestParam(value = "state", required = false) state: String?): Any = when {
-        name != null -> purposeService.findPurposeByName(name)
-        id != null && state != null -> purposeService.findByPersonIdAndState(id, state, false)
-        id != null -> purposeService.findByPersonIdAndState(id, "ACCEPT", true)
-        else -> mutableListOf<Any>()
+    fun getPurposeByName(
+            @RequestParam(value = "byName", required = false) name: String?,
+            @RequestParam(value = "state", required = false) state: String?,
+            @RequestHeader(value = "аuthorization", required = false) authorization: String?): ResponseEntity<Any> {
+        if (authorization.isNullOrBlank()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        val id = authService.decodeToken(authorization!!)
+        return when {
+            name != null -> ResponseEntity(purposeService.findPurposeByName(name), HttpStatus.OK)
+            id != null && state != null -> ResponseEntity(purposeService.findByPersonIdAndState(id, state, false), HttpStatus.OK)
+            id != null -> ResponseEntity(purposeService.findByPersonIdAndState(id, "ACCEPT", true), HttpStatus.OK)
+            else -> ResponseEntity(HttpStatus.NOT_FOUND)
+        }
     }
 
     @PostMapping("/")
@@ -43,16 +53,19 @@ class PurposeController(val purposeService: PurposeControllerService,
         purposeService.addPersonsToPurpose(id, addedPersons)
     }
 
-    @PostMapping("{purposeId}/person/{personId}/payment")
+    @PostMapping("{purposeId}/payment")
     fun receivePayment(@PathVariable purposeId: Long,
-                       @PathVariable personId: Long,
-                       @RequestBody newPayment: PaymentDTO): CodeDTO {
-        val paymentId = paymentService.createNewPayment(purposeId, personId, newPayment)?.id
-        val code = CardUtilClass.generateCode()
-        if (paymentId != null) {
-            CardUtilClass.storeCode(paymentId, code)
-            paymentService.sendCodeByPush(paymentId)
+                       @RequestBody newPayment: PaymentDTO,
+                       @RequestHeader("аuthorization", required = false) authorization: String?): ResponseEntity<CodeDTO> {
+        if (authorization.isNullOrBlank()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
-        return CodeDTO(paymentId, code)
+        paymentService.createNewPayment(purposeId, authorization!!, newPayment)?.let {
+            val code = CardUtilClass.generateCode()
+            CardUtilClass.storeCode(it.id, code)
+            paymentService.sendCodeByPush(it.id)
+            return ResponseEntity(CodeDTO(it.id, code), HttpStatus.OK)
+        }
+        return ResponseEntity(HttpStatus.BAD_REQUEST)
     }
 }
