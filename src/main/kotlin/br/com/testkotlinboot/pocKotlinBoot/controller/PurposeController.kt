@@ -31,7 +31,7 @@ class PurposeController(val purposeService: PurposeControllerService,
     fun getPurposeByName(
             @RequestParam(value = "byName", required = false) name: String?,
             @RequestParam(value = "state", required = false) state: String?,
-            @RequestHeader(value = "аuthorization", required = false) authorization: String?): ResponseEntity<Any> {
+            @RequestHeader(value = "Authorization", required = false) authorization: String?): ResponseEntity<Any> {
         if (authorization.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -56,7 +56,7 @@ class PurposeController(val purposeService: PurposeControllerService,
     @PostMapping("{purposeId}/payment")
     fun receivePayment(@PathVariable purposeId: Long,
                        @RequestBody newPayment: PaymentDTO,
-                       @RequestHeader("аuthorization", required = false) authorization: String?): ResponseEntity<CodeDTO> {
+                       @RequestHeader("Authorization", required = false) authorization: String?): ResponseEntity<CodeDTO> {
         if (authorization.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }

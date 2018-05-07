@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 class PersonController(val personService: PersonControllerService, val authService: AuthService) {
 
     @GetMapping("/")
-    fun getPurposeByPersonId(@RequestHeader("аuthorization", required = false) authorization: String?): ResponseEntity<String> {
+    fun getPurposeByPersonId(@RequestHeader("Authorization", required = false) authorization: String?): ResponseEntity<String> {
         if (authorization == null && authorization.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -28,7 +28,7 @@ class PersonController(val personService: PersonControllerService, val authServi
     fun getPersonByFacebookId(@PathVariable id: String) = personService.findPersonByFacebookId(id)
 
     @PutMapping("/state")
-    fun updateState(@RequestHeader("аuthorization", required = false) authorization: String?,
+    fun updateState(@RequestHeader("Authorization", required = false) authorization: String?,
                     @RequestBody status: StatusUpdate) : ResponseEntity<String> {
         if (authorization == null && authorization.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)

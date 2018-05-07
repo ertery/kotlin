@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 class YandexController(val personService: PersonControllerService) {
 
     @PutMapping("/")
-    fun toggleStatus(@RequestHeader(value = "token", required = true) token: String?,
+    fun toggleStatus(@RequestHeader(value = "Authorization", required = true) token: String?,
                      @RequestBody toggle: YandexToggleDTO): ResponseEntity<String> {
         return if (personService.togglePerson(toggle, token)) {
             ResponseEntity(HttpStatus.OK)
