@@ -19,9 +19,7 @@ import javax.annotation.Resource
 
 
 @Service("proxy")
-class PurposeControllerService(val purposeRepository: PurposeRepository,
-                               val personRepository: PersonRepository,
-                               val authService: AuthService) {
+class PurposeControllerService(val purposeRepository: PurposeRepository, val personRepository: PersonRepository, val authService: AuthService) {
 
     val LOGGER = LoggerFactory.getLogger(PurposeControllerService::class.java.name)
 
@@ -48,27 +46,25 @@ class PurposeControllerService(val purposeRepository: PurposeRepository,
     }
 
     @Transactional
-    fun addPurpose(purpose: CreatePurpose, authorization: String?): Any {
-        val initiatorId = authorization?.let { authService.decodeToken(it) }
-        val createPurpose = initiatorId?.let {
-            Purpose(name = purpose.name,
+    fun addPurpose(purpose: CreatePurpose, authorization: String?): Any? {
+        val initiatorId = authService.decodeToken(authorization!!)?: return null
+        val createPurpose = Purpose(name = purpose.name,
                 targetAmmount = purpose.targetAmmount,
                 finishDate = LocalDateTime.of(purpose.finishDate, LocalTime.now(ZoneId.of("Europe/Moscow"))),
                 imageUrl = purpose.imageUrl,
                 description = purpose.description,
-                initiatorId = it)
-        }
+                initiatorId = initiatorId)
 
         val forSave: MutableList<Person> = mutableListOf()
 
-        val newPurpose = createPurpose?.let { selfRef.savePurpose(it) }
+        val newPurpose = selfRef.savePurpose(createPurpose)
 
         val initPerson = personRepository.findOne(initiatorId)
 
         if (initPerson != null) {
-            val pp = newPurpose?.let { PurposePerson(it, initPerson) }
-            pp?.purposeState ?: PersonPurposeState.INITIAL
-            pp?.let { initPerson.purposes.add(it) }
+            val pp = PurposePerson(newPurpose, initPerson)
+            pp.purposeState = PersonPurposeState.INITIAL
+            initPerson.purposes.add(pp)
             forSave.add(initPerson)
             LOGGER.info("Person with id ${initPerson.personId} will be init person for new purpose with name ${purpose.name}")
         }
@@ -77,17 +73,17 @@ class PurposeControllerService(val purposeRepository: PurposeRepository,
             val existPerson = personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber))
             if (existPerson != null && !forSave.contains(existPerson)) {
                 LOGGER.info("Person with such phone number ${it.phoneNumber} already present in db")
-                val pp = newPurpose?.let { it1 -> PurposePerson(it1, existPerson) }
-                pp?.let { it1 -> existPerson.purposes.add(it1) }
+                val pp = PurposePerson(newPurpose, existPerson)
+                existPerson.purposes.add(pp)
                 forSave.add(existPerson)
             } else {
                 val person = Person(name = it.name!!, phoneNumber = PhoneUtilClass.format(it.phoneNumber))
                 if (!forSave.any { p -> p.phoneNumber == person.phoneNumber }) {
-                    val pp = newPurpose?.let { it1 -> PurposePerson(it1, person) }
+                    val pp = PurposePerson(newPurpose, person)
                     val paymentCard = PaymentCard()
                     paymentCard.person = person
                     person.paymentCard = paymentCard
-                    pp?.let { it1 -> person.purposes.add(it1) }
+                    person.purposes.add(pp)
                     forSave.add(person)
                     LOGGER.info("Person with phone number ${PhoneUtilClass.format(it.phoneNumber)} was successfully added for purpose ${purpose.name}")
                 }
@@ -99,11 +95,11 @@ class PurposeControllerService(val purposeRepository: PurposeRepository,
 
         forSave.filter { person -> !person.devices.isEmpty() }.forEach { person ->
             person.devices.forEach { device ->
-                CardUtilClass.sendPush(device.token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${newPurpose?.name}")
+                CardUtilClass.sendPush(device.token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${newPurpose.name}")
             }
         }
 
-        return mutableListOf(savedPurpose?.purposeId?.let { SavePurposeResponse(it, savedPersons.map { sp -> SavedPerson(sp.personId, PhoneUtilClass.format(sp.phoneNumber)) } as MutableList<SavedPerson>) })
+        return mutableListOf(SavePurposeResponse(savedPurpose.purposeId, savedPersons.map { sp -> SavedPerson(sp.personId, PhoneUtilClass.format(sp.phoneNumber)) } as MutableList<SavedPerson>))
     }
 
     @Transactional
