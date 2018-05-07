@@ -38,7 +38,7 @@ class PersonControllerService(
         LOGGER.info("Get purposes by person id: $id")
         val person: Person = personRepository.findOne(id)
         val purposes: MutableList<PurposeRecord> = mutableListOf()
-        person.purposes.forEach { (purpose) ->
+        person.purposes.filter {it -> !it.purpose.archived }.forEach { (purpose) ->
             val record: PurposeRecord = purpose.toDTO(true)
             record.isInitial = id == purpose.initiatorId
             purposes.add(record)

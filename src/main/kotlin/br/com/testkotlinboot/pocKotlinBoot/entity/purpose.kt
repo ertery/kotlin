@@ -42,6 +42,9 @@ data class Purpose(
 
         var description: String = "",
 
+        @Column
+        var archived: Boolean = false,
+
         @JsonIgnore
         @OneToMany(mappedBy = "purpose", cascade = arrayOf(CascadeType.ALL))
         var persons: MutableList<PurposePerson> = mutableListOf(),
@@ -63,12 +66,12 @@ data class Purpose(
                 PersonList(id = pp.person.personId,
                         name = pp.person.name,
                         imagePath = pp.person.imagePath,
-                        payments =  pp.person.payments.filter { payment ->  needPayment && (PaymentState.DONE == payment.state) && payment.purpose.purposeId == this.purposeId  }
+                        payments = pp.person.payments.filter { payment -> needPayment && (PaymentState.DONE == payment.state) && payment.purpose.purposeId == this.purposeId }
                                 .map { payment ->
-                            PaymentList(id = payment.id, ammount = payment.amount, paymentDate = payment.paymentDate, paymentMethod = payment.paymentMethod.toString())
-                        } as MutableList<PaymentList>,
+                                    PaymentList(id = payment.id, ammount = payment.amount, paymentDate = payment.paymentDate, paymentMethod = payment.paymentMethod.toString())
+                                } as MutableList<PaymentList>,
                         email = pp.person.email,
-                        purposeState = pp.purposeState.toString() ,
+                        purposeState = pp.purposeState.toString(),
                         phoneNumber = pp.person.phoneNumber)
             } as MutableList<PersonList>
     )

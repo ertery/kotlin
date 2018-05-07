@@ -29,7 +29,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
     lateinit var selfRef: PurposeControllerService
 
     fun getPurposes(authorization: String?): Any {
-        val findAll = purposeRepository.findAll()
+        val findAll = purposeRepository.findAll().filter { it -> !it.archived }
         val user = authService.decodeToken(authorization!!)
         val records: MutableList<PurposeRecord> = mutableListOf()
         findAll.filter {it -> it.persons.filter { it1 -> it1.person.personId == user}.count() == 1}.forEach { purpose -> records.add(purpose.toDTO(false)) }
@@ -41,9 +41,12 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         return findOne.toDTO(true)
     }
 
-    fun findPurposeByName(name: String): Any {
+    fun findPurposeByName(name: String): Any? {
         val findByName = purposeRepository.findByName(name)
-        return findByName.toDTO(true)
+        return if (findByName.archived){
+            null
+        }
+        else findByName.toDTO(true)
     }
 
     @Transactional
@@ -171,4 +174,19 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun savePurpose(purpose: Purpose): Purpose = purposeRepository.saveAndFlush(purpose)
+
+    @Transactional
+    fun deletePurpose(purposeId: Long, authorization: String?):Boolean {
+        val purpose =  purposeRepository.getOne(purposeId)
+        purpose?.let {
+            val initPerson =  purpose.persons.filter { it.purposeState == PersonPurposeState.INITIAL}[0]
+            if (initPerson.person.personId != authService.decodeToken(authorization!!)){
+                return false
+            }
+            purpose.archived = true
+            purposeRepository.save(purpose)
+            return true
+        }
+        return false
+    }
 }

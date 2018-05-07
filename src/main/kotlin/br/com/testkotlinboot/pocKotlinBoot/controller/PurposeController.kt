@@ -21,7 +21,7 @@ class PurposeController(val purposeService: PurposeControllerService,
 
 
     @GetMapping("/")
-    fun getPurposes(@RequestHeader(value = "Authorization", required = false) authorization: String?):ResponseEntity<Any> {
+    fun getPurposes(@RequestHeader(value = "Authorization", required = false) authorization: String?): ResponseEntity<Any> {
         if (authorization.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -35,7 +35,7 @@ class PurposeController(val purposeService: PurposeControllerService,
     fun getPurposeByName(
             @RequestParam(value = "byName", required = false) name: String?,
             @RequestParam(value = "state", required = false) state: String?,
-            @RequestHeader(value = "Authorization", required = false) authorization: String?): ResponseEntity<Any> {
+            @RequestHeader(value = "Authorization", required = false) authorization: String?): ResponseEntity<Any?> {
         if (authorization.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -54,7 +54,7 @@ class PurposeController(val purposeService: PurposeControllerService,
         if (authorization.isNullOrBlank()) {
             return ResponseEntity<HttpStatus>(HttpStatus.BAD_REQUEST)
         }
-        return  ResponseEntity(purposeService.addPurpose(newPurpose, authorization), HttpStatus.OK)
+        return ResponseEntity(purposeService.addPurpose(newPurpose, authorization), HttpStatus.OK)
     }
 
     @PostMapping("/{id}/person")
@@ -77,5 +77,16 @@ class PurposeController(val purposeService: PurposeControllerService,
             return ResponseEntity(CodeDTO(it.id, code), HttpStatus.OK)
         }
         return ResponseEntity(HttpStatus.BAD_REQUEST)
+    }
+
+    @DeleteMapping("{purposeId}/delete")
+    fun delete(@RequestHeader("Authorization", required = false) authorization: String?,
+               @PathVariable purposeId: Long): ResponseEntity<Any> {
+        if (authorization.isNullOrBlank()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        return if  (purposeService.deletePurpose(purposeId, authorization)) {
+            ResponseEntity(HttpStatus.OK)
+        } else ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
     }
 }
