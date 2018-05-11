@@ -163,11 +163,13 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
 
         val purposes: MutableList<PurposeRecord> = mutableListOf()
         person.purposes
-                .filter { it -> (!it.purpose.archived && it.purposeState == PersonPurposeState.valueOf(state.toUpperCase()) || (applySecondCondition && it.purposeState == PersonPurposeState.INITIAL)) }
+                .filter { it -> (it.purposeState == PersonPurposeState.valueOf(state.toUpperCase()) || (applySecondCondition && it.purposeState == PersonPurposeState.INITIAL)) }
                 .forEach { (purpose) ->
-                    val record: PurposeRecord = purpose.toDTO(true)
-                    record.isInitial = personId == purpose.initiatorId
-                    purposes.add(record)
+                    if (!purpose.archived) {
+                        val record: PurposeRecord = purpose.toDTO(true)
+                        record.isInitial = personId == purpose.initiatorId
+                        purposes.add(record)
+                    }
                 }
         return purposes
     }
