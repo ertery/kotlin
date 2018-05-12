@@ -7,4 +7,5 @@ import java.time.LocalDateTime
 data class PurposeModifyDTO(val imageUrl: String?,
                             val description: String?,
                             val targetAmmount: Double?,
-                            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-dd-MM") val finishDate: LocalDate?)
+                            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-dd-MM") val finishDate: LocalDate?,
+                            val name: String?)

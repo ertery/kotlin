@@ -203,6 +203,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         purposeModify.finishDate?.let { purpose.finishDate = it.atTime(23, 59)}
         purposeModify.imageUrl?.let { purpose.imageUrl = it }
         purposeModify.targetAmmount?.let { purpose.targetAmmount = it }
+        purposeModify.name?.let { purpose.name = it }
 
         purposeRepository.save(purpose)
 
