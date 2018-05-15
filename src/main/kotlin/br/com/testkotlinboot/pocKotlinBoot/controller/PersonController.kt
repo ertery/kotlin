@@ -50,7 +50,7 @@ class PersonController(val personService: PersonControllerService, val authServi
         return ResponseEntity(HttpStatus.OK)
     }
 
-    @PutMapping("/person")
+    @PutMapping("")
     fun updatePerson(@RequestBody person: PersonModifyDTO,
             @RequestHeader("Authorization", required = false) authorization: String?):ResponseEntity<Any>{
         if (authorization.isNullOrBlank()) {
