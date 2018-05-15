@@ -116,7 +116,7 @@ internal class PersonControllerServiceTest {
         val savedPerson =  personRepository.saveAndFlush(person)
 
         assertEquals(PersonPurposeState.INVITESEND, savedPerson.purposes[0].purposeState)
-        service.updateState(StatusUpdate(personId = savedPerson.personId, purposeId = savedPurpose.purposeId, state = PersonPurposeState.ACCEPT.toString()))
+        service.updateState(StatusUpdate(personId = savedPerson.personId, purposeId = savedPurpose.purposeId, state = PersonPurposeState.ACCEPT.toString()), "")
         assertEquals(PersonPurposeState.ACCEPT, personRepository.findOne(savedPerson.personId).purposes[0].purposeState)
     }
 

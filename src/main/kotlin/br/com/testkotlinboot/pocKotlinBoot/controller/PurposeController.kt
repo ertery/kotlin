@@ -63,15 +63,12 @@ class PurposeController(val purposeService: PurposeControllerService,
     @PostMapping("{purposeId}/payment")
     fun receivePayment(@PathVariable purposeId: Long,
                        @RequestBody newPayment: PaymentDTO,
-                       @RequestHeader("Authorization", required = false) authorization: String?): ResponseEntity<CodeDTO> {
+                       @RequestHeader("Authorization", required = false) authorization: String?): ResponseEntity<Any> {
         if (authorization.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
         paymentService.createNewPayment(purposeId, authorization!!, newPayment)?.let {
-            val code = CardUtilClass.generateCode()
-            CardUtilClass.storeCode(it.id, code)
-            paymentService.sendCodeByPush(it.id)
-            return ResponseEntity(CodeDTO(it.id, code), HttpStatus.OK)
+            return ResponseEntity(it.id, HttpStatus.OK)
         }
         return ResponseEntity(HttpStatus.BAD_REQUEST)
     }
