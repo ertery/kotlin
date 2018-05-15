@@ -24,12 +24,13 @@ class PaymentControllerService(val paymentRepository: PaymentRepository,
 
     private val LOGGER = LoggerFactory.getLogger(PersonControllerService::class.java)
 
+    @Transactional
     fun createNewPayment(purposeId: Long, authorization: String, newPayment: PaymentDTO): Payment? {
 
         val payment = Payment(amount = newPayment.ammount)
         payment.paymentMethod = PaymentMethod.valueOf(newPayment.paymentMethod.toUpperCase())
         payment.channel = Channel.valueOf(newPayment.channel.toUpperCase())
-        payment.state = PaymentState.NEW
+        payment.state = PaymentState.valueOf(newPayment.state.toUpperCase())
 
         val person = personRepository.findOne(authService.decodeToken(authorization))
         val purpose = purposeRepository.findOne(purposeId)
@@ -43,6 +44,11 @@ class PaymentControllerService(val paymentRepository: PaymentRepository,
 
         person.payments.add(payment)
         purpose.payments.add(payment)
+
+        if (PaymentState.DONE == payment.state) {
+            purpose.currentAmmount += payment.amount
+            purposeRepository.save(purpose)
+        }
 
         return paymentRepository.saveAndFlush(payment)
     }
@@ -70,7 +76,7 @@ class PaymentControllerService(val paymentRepository: PaymentRepository,
         }
 
         if (isSuccess) processedPayment.state = PaymentState.DONE
-        else processedPayment.state = PaymentState.DECLINED
+        else processedPayment.state = PaymentState.DECLINE
 
         paymentRepository.saveAndFlush(processedPayment)
 
