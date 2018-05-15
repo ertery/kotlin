@@ -38,7 +38,7 @@ class PersonControllerService(
         LOGGER.info("Get purposes by person id: $id")
         val person: Person = personRepository.findOne(id)
         val purposes: MutableList<PurposeRecord> = mutableListOf()
-        person.purposes.filter {it -> !it.purpose.archived }.forEach { (purpose) ->
+        person.purposes.filter { it -> !it.purpose.archived }.forEach { (purpose) ->
             val record: PurposeRecord = purpose.toDTO(true)
             record.isInitial = id == purpose.initiatorId
             purposes.add(record)
@@ -164,5 +164,15 @@ class PersonControllerService(
         person.yandexConnected = toggle.connect
         personRepository.save(person)
         return true
+    }
+
+    @Transactional
+    fun updatePerson(person: PersonModifyDTO, authorization: String?) {
+        val personId = authService.decodeToken(authorization!!)
+        val existedPerson = personRepository.findOne(personId)
+        person.name?.let { existedPerson.name = it }
+        person.imagePath?.let { existedPerson.imagePath = it }
+
+        personRepository.save(existedPerson)
     }
 }

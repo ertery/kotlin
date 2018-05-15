@@ -1,9 +1,6 @@
 package br.com.testkotlinboot.pocKotlinBoot.controller
 
-import br.com.testkotlinboot.pocKotlinBoot.dto.CardDTO
-import br.com.testkotlinboot.pocKotlinBoot.dto.PersonDTO
-import br.com.testkotlinboot.pocKotlinBoot.dto.StatusUpdate
-import br.com.testkotlinboot.pocKotlinBoot.dto.TokenDTO
+import br.com.testkotlinboot.pocKotlinBoot.dto.*
 import br.com.testkotlinboot.pocKotlinBoot.service.AuthService
 import br.com.testkotlinboot.pocKotlinBoot.service.PersonControllerService
 import org.springframework.http.HttpStatus
@@ -50,6 +47,16 @@ class PersonController(val personService: PersonControllerService, val authServi
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
         personService.addToken(token, authorization.toString())
+        return ResponseEntity(HttpStatus.OK)
+    }
+
+    @PutMapping("/person")
+    fun updatePerson(@RequestBody person: PersonModifyDTO,
+            @RequestHeader("Authorization", required = false) authorization: String?):ResponseEntity<Any>{
+        if (authorization.isNullOrBlank()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        personService.updatePerson(person, authorization)
         return ResponseEntity(HttpStatus.OK)
     }
 
