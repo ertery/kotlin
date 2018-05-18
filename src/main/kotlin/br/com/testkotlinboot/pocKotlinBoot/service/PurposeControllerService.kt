@@ -97,7 +97,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         val savedPurpose = purposeRepository.saveAndFlush(newPurpose)
         val savedPersons = personRepository.save(forSave)
 
-        forSave.filter { person -> !person.devices.isEmpty() }.forEach { person ->
+        forSave.filter { person -> !person.devices.isEmpty() && person.personId != savedPurpose.initiatorId }.forEach { person ->
             person.devices.forEach { device ->
                 CardUtilClass.sendPush(device.token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${newPurpose.name}")
             }
