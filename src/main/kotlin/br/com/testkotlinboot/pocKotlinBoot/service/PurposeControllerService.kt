@@ -2,12 +2,19 @@ package br.com.testkotlinboot.pocKotlinBoot.service
 
 
 import br.com.testkotlinboot.pocKotlinBoot.dto.*
-import br.com.testkotlinboot.pocKotlinBoot.entity.*
+import br.com.testkotlinboot.pocKotlinBoot.entity.PaymentCard
+import br.com.testkotlinboot.pocKotlinBoot.entity.Person
+import br.com.testkotlinboot.pocKotlinBoot.entity.Purpose
+import br.com.testkotlinboot.pocKotlinBoot.entity.PurposePerson
 import br.com.testkotlinboot.pocKotlinBoot.enums.PersonPurposeState
 import br.com.testkotlinboot.pocKotlinBoot.repository.PersonRepository
 import br.com.testkotlinboot.pocKotlinBoot.repository.PurposeRepository
 import br.com.testkotlinboot.pocKotlinBoot.utils.CardUtilClass
 import br.com.testkotlinboot.pocKotlinBoot.utils.PhoneUtilClass
+import br.com.testkotlinboot.pocKotlinBoot.utils.SMSender
+import br.com.testkotlinboot.pocKotlinBoot.utils.ServiceValues
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
@@ -16,11 +23,14 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import javax.annotation.Resource
-import kotlin.system.exitProcess
 
 
 @Service("proxy")
-class PurposeControllerService(val purposeRepository: PurposeRepository, val personRepository: PersonRepository, val authService: AuthService) {
+class PurposeControllerService(val purposeRepository: PurposeRepository,
+                               val personRepository: PersonRepository,
+                               val authService: AuthService,
+                               val sender: SMSender,
+                               val values: ServiceValues) {
 
     val LOGGER = LoggerFactory.getLogger(PurposeControllerService::class.java.name)
 
@@ -119,7 +129,8 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
         val forSave: MutableList<Person> = mutableListOf()
 
         addedPersons.forEach {
-            val person = personRepository.findByPhoneNumber(PhoneUtilClass.format(it.phoneNumber))
+            val formattedPhone = PhoneUtilClass.format(it.phoneNumber);
+            val person = personRepository.findByPhoneNumber(formattedPhone)
             if (person != null) {
                 val pp = PurposePerson(purpose, person)
                 if (!purpose.persons.contains(pp)) {
@@ -130,6 +141,8 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
                         person.devices.forEach { device ->
                             CardUtilClass.sendPush(device.token, PUSH_TITLE_INVITE, "Вас пригласили в кампанию ${purpose.name}")
                         }
+                    } else {
+                        sendWelcomeToNewPurposeSms(formattedPhone, purpose.name)
                     }
                     LOGGER.info("Person with id ${person.personId} was successfully invited for purpose ${purpose.name}")
                 }
@@ -139,7 +152,8 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
                     val pp = PurposePerson(purpose, personSave)
                     personSave.purposes.add(pp)
                     forSave.add(personSave)
-                    LOGGER.info("Person with phone number ${PhoneUtilClass.format(it.phoneNumber)} was successfully join to purpose ${purpose.name}")
+                    sendWelcomeToNewPurposeSms(formattedPhone, purpose.name)
+                    LOGGER.info("Person with phone number $formattedPhone successfully join to purpose ${purpose.name}")
                 }
             }
         }
@@ -149,6 +163,25 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
 
         return 0
     }
+
+    @Transactional
+    fun sendWelcomeToNewPurposeSms(phone: String, companyName: String) {
+        val text = "Вас пригласили в кампанию $companyName"
+        val messages: Array<String> = runBlocking {
+            val l = async { send(phone, text) }
+            l.await()
+        }
+
+        if (Integer.valueOf(messages[1]) == 1) {
+            LOGGER.info("Sms with invite to $companyName was successfully send to 7$phone")
+        } else {
+            LOGGER.info("Sms with invite to $companyName was't delivered to the  7$phone")
+        }
+    }
+
+    suspend fun send(phone: String, text: String): Array<String> = sender
+            .sendSms("7$phone", text, values.fake == "fake")
+
 
     @Transactional
     fun findByPersonIdAndState(personId: Long, state: String, applySecondCondition: Boolean): Any {
@@ -200,7 +233,7 @@ class PurposeControllerService(val purposeRepository: PurposeRepository, val per
             return false
         }
         purposeModify.description?.let { purpose.description = it }
-        purposeModify.finishDate?.let { purpose.finishDate = it.atTime(23, 59)}
+        purposeModify.finishDate?.let { purpose.finishDate = it.atTime(23, 59) }
         purposeModify.imageUrl?.let { purpose.imageUrl = it }
         purposeModify.targetAmmount?.let { purpose.targetAmmount = it }
         purposeModify.name?.let { purpose.name = it }
